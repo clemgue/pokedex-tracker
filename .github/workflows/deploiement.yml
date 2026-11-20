@@ -27,6 +27,11 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Tests du script de données
+        run: python -m unittest discover tools/data
       - run: npm ci
       - run: npm run check
       - run: npm test

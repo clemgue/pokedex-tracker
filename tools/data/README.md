@@ -5,8 +5,12 @@ Script Python (3.11+) qui produit `static/data/jeux/<jeu>.json`, le fichier lu p
 ```powershell
 python -m pip install --user truststore   # une seule fois
 cd tools/data
-python build.py rouge-bleu-jaune
+python build.py rouge-bleu-jaune          # un jeu
+python build.py tous                      # tous les jeux de jeux/*.json
 ```
+
+Le premier passage interroge PokéAPI pour chaque espèce (jusqu'à 1 025) : comptez une quinzaine
+de minutes ; les suivants utilisent le cache et prennent quelques secondes.
 
 Les réponses de PokéAPI et de Poképédia sont mises en cache dans `tools/data/.cache/`
 (non versionné). Supprimer ce dossier force un rafraîchissement complet. Débit limité :
@@ -23,9 +27,14 @@ Les réponses de PokéAPI et de Poképédia sont mises en cache dans `tools/data
 
 ## Ajouter un jeu
 
-1. Créer `jeux/<jeu>.json` sur le modèle de `rouge-bleu-jaune.json` :
-   versions (avec le groupe de sprites PokéAPI), Pokédex PokéAPI, modules Poképédia et codes de
-   version utilisés dans ces modules (`R`, `B`…), ordre des lieux.
+1. Créer `jeux/<jeu>.json` sur le modèle des fichiers existants :
+   - `versions` : identifiant, nom, couleur, `codes` (suffixes de version utilisés dans les modules
+     Poképédia, ex. `R`, `B`, `RuO`), `sprites_pokeapi` (groupe de sprites PokéAPI, ou `null`) ;
+   - `pokedex` : Pokédex PokéAPI (`pokeapi`), `max` pour limiter le national à la génération,
+     ou sans `pokeapi` pour un Pokédex reconstruit à partir des Pokémon présents ;
+   - `megas: true` pour suivre les Méga-évolutions ;
+   - `sources_pokepedia` : modules et versions qu'ils couvrent ;
+   - `ordre_lieux` (facultatif) : ordre de progression ; sinon tri naturel des noms.
 2. Lancer `python build.py <jeu>` et lire le rapport : chaque avertissement signale une donnée à
    vérifier (nom inconnu, page Poképédia introuvable, lieu sans ordre, écart avec la liste
    « Indisponibles » de Poképédia).
@@ -43,14 +52,20 @@ Les réponses de PokéAPI et de Poképédia sont mises en cache dans `tools/data
                 "versions": [{ "id", "nom", "couleur" }] },
   "methodes": { "hautes_herbes": "Hautes herbes", … },          // libellés des méthodes
   "pokedex":  [{ "id", "nom", "entrees": [{ "numero", "pokemon" }] }],
-  "pokemon":  [{ "id" /* n° national */, "nom", "nom_en", "types", "sprites": { "<version>": url },
-                 "artwork", "url_pokepedia" }],
+  "pokemon":  [{ "id" /* n° national */, "nom", "nom_en", "types",
+                 "sprites": { "<version>" | "*": url }, "sprites_chromatiques"?, "artwork",
+                 "url_pokepedia", "formes"?: [{ "id", "nom", "type": "forme" | "mega" }] }],
   "lieux":    [{ "id", "nom", "url_pokepedia", "versions", "ordre" }],
-  "obtentions": [{ "id", "pokemon", "lieu" /* ou null */, "methode", "detail", "zone",
-                   "versions", "niveaux", "taux" /* % ou null */, "taux_texte",
-                   "depuis" /* évolutions : pré-évolution */, "glitch" }]
+  "obtentions": [{ "id", "pokemon", "forme"?, "lieu"?, "methode", "detail"?, "zone"?,
+                   "versions", "niveaux"?, "taux"? /* % */, "taux_texte"?, "notes"?,
+                   "depuis"? /* évolutions : pré-évolution */, "glitch" }]
 }
 ```
+
+- Les champs vides sont omis (`?`) pour alléger les fichiers.
+- `sprites["*"]` : sprite identique pour toutes les versions du jeu.
+- Méthode `autre` : milieu Poképédia non classé automatiquement, texte conservé dans `detail`
+  (le rapport de génération liste les plus fréquents).
 
 - `versions` d'un lieu = versions où au moins un Pokémon y est obtenable : l'application
   n'affiche un lieu que pour ces versions.
