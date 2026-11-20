@@ -4,16 +4,27 @@
 	import { onMount } from 'svelte';
 	import BasculeTheme from '$lib/composants/BasculeTheme.svelte';
 	import { etat } from '$lib/etat.svelte';
+	import { synchro } from '$lib/sync/sync.svelte';
 
 	let { children } = $props();
 
-	onMount(() => {
-		etat.init();
+	onMount(async () => {
+		await etat.init();
+		await synchro.init();
 	});
+
+	const titresSynchro = {
+		deconnecte: 'Réglages — synchronisation Dropbox non configurée',
+		pret: 'Réglages — synchronisé avec Dropbox',
+		en_cours: 'Réglages — synchronisation en cours…',
+		erreur: 'Réglages — erreur de synchronisation',
+		hors_ligne: 'Réglages — hors ligne'
+	};
 
 	const liens = [
 		{ href: '#/', libelle: 'Pokédex', route: '/', aussi: ['/pokemon/[id]'] },
 		{ href: '#/lieux', libelle: 'Lieux', route: '/lieux', aussi: ['/lieux/[id]'] },
+		{ href: '#/stats', libelle: 'Bilan', route: '/stats', aussi: [] },
 		{ href: '#/parties', libelle: 'Parties', route: '/parties', aussi: [] }
 	];
 </script>
@@ -32,6 +43,17 @@
 				<span class="partie">{etat.partieActive.nom}</span>
 			{/if}
 		</div>
+		<a
+			class="reglages statut-{synchro.statut}"
+			href="#/reglages"
+			title={titresSynchro[synchro.statut]}
+			aria-label={titresSynchro[synchro.statut]}
+		>
+			<svg viewBox="0 0 24 24" aria-hidden="true"
+				><path d="M7 18h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.1 9.1 4.5 4.5 0 0 0 7 18z" /></svg
+			>
+			<span class="voyant-synchro"></span>
+		</a>
 		<BasculeTheme />
 	</header>
 
@@ -135,13 +157,59 @@
 		white-space: nowrap;
 	}
 
+	.reglages {
+		position: relative;
+		display: grid;
+		place-items: center;
+		width: 40px;
+		height: 40px;
+		border: 2px solid rgb(0 0 0 / 0.25);
+		border-radius: 50%;
+		background: var(--coque-fonce);
+		color: var(--coque-texte);
+		box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.15);
+	}
+	.reglages:hover {
+		background: var(--coque-clair);
+	}
+	.reglages svg {
+		width: 22px;
+		height: 22px;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2;
+		stroke-linejoin: round;
+	}
+	.voyant-synchro {
+		position: absolute;
+		right: 1px;
+		bottom: 1px;
+		width: 11px;
+		height: 11px;
+		border: 2px solid var(--coque-fonce);
+		border-radius: 50%;
+		background: #9a9a9a;
+	}
+	.statut-pret .voyant-synchro {
+		background: var(--voyant-vert);
+	}
+	.statut-en_cours .voyant-synchro {
+		background: var(--voyant-jaune);
+	}
+	.statut-erreur .voyant-synchro {
+		background: var(--voyant-rouge);
+	}
+
 	.onglets {
 		display: flex;
 		gap: 4px;
 		padding: 10px 16px 0;
 		background: var(--coque-fonce);
+		overflow-x: auto;
+		scrollbar-width: none;
 	}
 	.onglets a {
+		flex: none;
 		padding: 8px 16px;
 		border-radius: 10px 10px 0 0;
 		color: var(--coque-texte);

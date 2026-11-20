@@ -4,6 +4,7 @@
  */
 import { db } from './db';
 import { chargerIndex, chargerJeu } from './donnees';
+import { FORMAT_FICHIER, type FichierProgression } from './sync/fusion';
 import type { Capture, DonneesJeu, InfoJeu, Partie } from './types';
 
 class Etat {
@@ -14,18 +15,24 @@ class Etat {
 	partieActiveId = $state<string | null>(null);
 	donnees = $state.raw<DonneesJeu | null>(null);
 	chargementJeu = $state(false);
+	/** Marqueurs de suppression (identifiant → date), pour propager les suppressions à la synchro */
+	supprimees: Record<string, number> = {};
+	/** Appelé après chaque modification locale (branché par la synchronisation) */
+	surModification: (() => void) | null = null;
 
 	partieActive = $derived(this.parties.find((p) => p.id === this.partieActiveId) ?? null);
 
 	async init() {
 		if (this.pret) return;
 		try {
-			const [jeux, parties, active] = await Promise.all([
+			const [jeux, parties, active, supprimees] = await Promise.all([
 				chargerIndex(),
 				db.toutesLesParties(),
-				db.lireReglage<string>('partieActive')
+				db.lireReglage<string>('partieActive'),
+				db.lireReglage<Record<string, number>>('supprimees')
 			]);
 			this.jeux = jeux;
+			this.supprimees = supprimees ?? {};
 			this.parties = parties.sort((a, b) => a.creee - b.creee);
 			this.partieActiveId = parties.some((p) => p.id === active) ? active! : (parties[0]?.id ?? null);
 			await this.chargerDonneesActives();
@@ -54,6 +61,33 @@ class Etat {
 	private async sauver(partie: Partie) {
 		partie.modifiee = Date.now();
 		await db.enregistrerPartie($state.snapshot(partie) as Partie);
+		this.surModification?.();
+	}
+
+	/** Copie complète de la progression locale (pour la synchronisation et l'export). */
+	fichierLocal(): FichierProgression {
+		return {
+			format: FORMAT_FICHIER,
+			application: 'pokedex-tracker',
+			modifie: Math.max(0, ...this.parties.map((p) => p.modifiee), ...Object.values(this.supprimees)),
+			parties: $state.snapshot(this.parties) as Partie[],
+			supprimees: { ...this.supprimees }
+		};
+	}
+
+	/** Remplace la progression locale par une copie (fusionnée) : mémoire + IndexedDB. */
+	async appliquerFichier(f: FichierProgression) {
+		const nouvelles = new Set(f.parties.map((p) => p.id));
+		for (const p of this.parties) if (!nouvelles.has(p.id)) await db.supprimerPartie(p.id);
+		for (const p of f.parties) await db.enregistrerPartie(p);
+		this.supprimees = { ...f.supprimees };
+		await db.ecrireReglage('supprimees', this.supprimees);
+		this.parties = [...f.parties].sort((a, b) => a.creee - b.creee);
+		if (!this.parties.some((p) => p.id === this.partieActiveId)) {
+			this.partieActiveId = this.parties[0]?.id ?? null;
+			await db.ecrireReglage('partieActive', this.partieActiveId);
+		}
+		await this.chargerDonneesActives();
 	}
 
 	async activer(id: string) {
@@ -76,6 +110,7 @@ class Etat {
 		this.parties.push(partie);
 		await db.enregistrerPartie(partie);
 		await this.activer(partie.id);
+		this.surModification?.();
 	}
 
 	async renommer(id: string, nom: string) {
@@ -88,12 +123,15 @@ class Etat {
 	async supprimer(id: string) {
 		this.parties = this.parties.filter((p) => p.id !== id);
 		await db.supprimerPartie(id);
+		this.supprimees[id] = Date.now();
+		await db.ecrireReglage('supprimees', this.supprimees);
 		if (this.partieActiveId === id) {
 			const suivante = this.parties[0]?.id ?? null;
 			this.partieActiveId = suivante;
 			await db.ecrireReglage('partieActive', suivante);
 			await this.chargerDonneesActives();
 		}
+		this.surModification?.();
 	}
 
 	estAttrape(pokemon: number): boolean {

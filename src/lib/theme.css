@@ -206,6 +206,11 @@ select {
 	background: var(--bouton-survol);
 }
 
+.bouton:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
 .bouton.secondaire {
 	background: transparent;
 	color: var(--ecran-texte);
