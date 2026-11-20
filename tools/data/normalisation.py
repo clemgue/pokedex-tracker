@@ -121,7 +121,12 @@ _REGLES = [
     ("hautes_herbes", ("herbe", "fleurs", "hordes", "troupeaux", "essaim", "poké radar", "navi-dex")),
     ("marche", ("rez-de-chaussée", "étage", "sous-sol", "en marchant", "au sol", "sable", "poussière",
                 "sol accidenté", "toits", "marécage", "dans les airs", "arbre", "coup d'boule", "éclate-roc",
-                "ombre", "canal", "volants", "vols d'oiseaux", "embuscade", "tas de baies")),
+                "ombre", "canal", "volants", "vols d'oiseaux", "embuscade", "tas de baies",
+                # Jeux récents : biomes, Pokémon visibles, conditions d'apparition, radio…
+                "prairie", "rocheuse", "rivière", "lac", "océan", "plage", "grotte", "neige", "montagne",
+                "ville", "désert", "ruines", "forêt", "bambou", "marais", "cachés", "vadrouilleurs",
+                "rencontrables", "obtenu", "apparition rare", "insérant", "son hoenn", "son sinnoh",
+                "trouée", "renfort", "fuite", "crédits")),
 ]
 
 
@@ -247,9 +252,12 @@ def normaliser_entree(entree: dict, codes: dict[str, str], versions: list[str]) 
 
 
 def analyser_nom(nom: str) -> tuple[str, str | None]:
-    """« Miaouss forme(Galar) » → (« Miaouss », « Galar ») ; « Pikachu » → (« Pikachu », None)."""
-    m = re.match(r"^(.*?)\s+forme\((.*)\)\s*$", nom)
-    return (m.group(1).strip(), m.group(2).strip()) if m else (nom.strip(), None)
+    """« Miaouss forme(Galar) » → (« Miaouss », « Galar ») ; « Pitrouille nom(Taille Maxi) » → forme
+    « Taille Maxi » ; « Wimessir sexe(f) » → (« Wimessir », None) : le sexe n'est pas une forme suivie."""
+    m = re.match(r"^(.*?)\s+(forme|nom|sexe)\((.*)\)\s*$", nom)
+    if not m:
+        return nom.strip(), None
+    return m.group(1).strip(), (None if m.group(2) == "sexe" else m.group(3).strip())
 
 
 def analyser_lieu(cle: str) -> tuple[str, str, str | None]:

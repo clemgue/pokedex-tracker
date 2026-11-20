@@ -486,19 +486,19 @@ def controler_indisponibles(config, especes, obtentions, par_nom) -> None:
             continue
         if not isinstance(indispo, dict):
             continue
+        # Conflit réel : Poképédia dit le Pokémon indisponible par capture (échange/transfert requis),
+        # alors que le script le trouve capturable dans toutes les versions du module.
         connus = {e["pokemon"] for e in config["corrections"].get("ecarts_pokepedia_connus", [])
                   if e["module"] == src["module"]}
-        echange_partout = {o["pokemon"] for o in obtentions if o["methode"] == "echange_version"
-                           and set(src["versions"]) <= set(o["versions"])}
-        attendus = {par_nom[n] for n, texte in indispo.items()
-                    if isinstance(texte, str) and "change" in texte and n in par_nom and n not in connus
-                    and par_nom[n] in especes}
-        for pid in sorted(attendus - echange_partout):
-            avertir(f"[{src['module']}] Poképédia indique {especes[pid]['nom']} obtenable seulement par échange, "
-                    f"le script le trouve obtenable en jeu")
-        for pid in sorted(echange_partout - attendus):
-            avertir(f"[{src['module']}] Le script met {especes[pid]['nom']} en échange inter-versions, "
-                    f"absent de la liste Indisponibles de Poképédia")
+        capturable_partout = set.intersection(*[
+            {o["pokemon"] for o in obtentions if v in o["versions"] and o["methode"] in METHODES_DIRECTES}
+            for v in src["versions"]])
+        indisponibles = {par_nom[norm.analyser_nom(n)[0]] for n, texte in indispo.items()
+                         if isinstance(texte, str) and "change" in texte and norm.analyser_nom(n)[0] in par_nom
+                         and n not in connus}
+        for pid in sorted((indisponibles & capturable_partout) & set(especes)):
+            avertir(f"[{src['module']}] Poképédia indique {especes[pid]['nom']} indisponible par capture, "
+                    f"le script le trouve capturable")
 
 
 def rapport(config, especes, lieux, obtentions) -> None:
