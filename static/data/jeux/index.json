@@ -26,6 +26,385 @@
     }
    ],
    "fichier": "rouge-bleu-jaune.json"
+  },
+  {
+   "id": "or-argent-cristal",
+   "nom": "Pokémon Or, Argent et Cristal",
+   "generation": 2,
+   "region": "Johto",
+   "annee_sortie": 1999,
+   "annee_sortie_fr": 2001,
+   "ordre": 2,
+   "versions": [
+    {
+     "id": "or",
+     "nom": "Or",
+     "couleur": "#c9a227"
+    },
+    {
+     "id": "argent",
+     "nom": "Argent",
+     "couleur": "#9aa5b1"
+    },
+    {
+     "id": "cristal",
+     "nom": "Cristal",
+     "couleur": "#4fc3f7"
+    }
+   ],
+   "fichier": "or-argent-cristal.json"
+  },
+  {
+   "id": "rubis-saphir-emeraude",
+   "nom": "Pokémon Rubis, Saphir et Émeraude",
+   "generation": 3,
+   "region": "Hoenn",
+   "annee_sortie": 2002,
+   "annee_sortie_fr": 2003,
+   "ordre": 3,
+   "versions": [
+    {
+     "id": "rubis",
+     "nom": "Rubis",
+     "couleur": "#c62828"
+    },
+    {
+     "id": "saphir",
+     "nom": "Saphir",
+     "couleur": "#1565c0"
+    },
+    {
+     "id": "emeraude",
+     "nom": "Émeraude",
+     "couleur": "#2e7d32"
+    }
+   ],
+   "fichier": "rubis-saphir-emeraude.json"
+  },
+  {
+   "id": "rouge-feu-vert-feuille",
+   "nom": "Pokémon Rouge Feu et Vert Feuille",
+   "generation": 3,
+   "region": "Kanto",
+   "annee_sortie": 2004,
+   "annee_sortie_fr": 2004,
+   "ordre": 4,
+   "versions": [
+    {
+     "id": "rouge-feu",
+     "nom": "Rouge Feu",
+     "couleur": "#e65100"
+    },
+    {
+     "id": "vert-feuille",
+     "nom": "Vert Feuille",
+     "couleur": "#43a047"
+    }
+   ],
+   "fichier": "rouge-feu-vert-feuille.json"
+  },
+  {
+   "id": "diamant-perle-platine",
+   "nom": "Pokémon Diamant, Perle et Platine",
+   "generation": 4,
+   "region": "Sinnoh",
+   "annee_sortie": 2006,
+   "annee_sortie_fr": 2007,
+   "ordre": 5,
+   "versions": [
+    {
+     "id": "diamant",
+     "nom": "Diamant",
+     "couleur": "#5c6bc0"
+    },
+    {
+     "id": "perle",
+     "nom": "Perle",
+     "couleur": "#ec407a"
+    },
+    {
+     "id": "platine",
+     "nom": "Platine",
+     "couleur": "#78909c"
+    }
+   ],
+   "fichier": "diamant-perle-platine.json"
+  },
+  {
+   "id": "heartgold-soulsilver",
+   "nom": "Pokémon Or HeartGold et Argent SoulSilver",
+   "generation": 4,
+   "region": "Johto",
+   "annee_sortie": 2009,
+   "annee_sortie_fr": 2010,
+   "ordre": 6,
+   "versions": [
+    {
+     "id": "heartgold",
+     "nom": "Or HeartGold",
+     "couleur": "#d4a017"
+    },
+    {
+     "id": "soulsilver",
+     "nom": "Argent SoulSilver",
+     "couleur": "#90a4ae"
+    }
+   ],
+   "fichier": "heartgold-soulsilver.json"
+  },
+  {
+   "id": "noir-blanc",
+   "nom": "Pokémon Noir et Blanc",
+   "generation": 5,
+   "region": "Unys",
+   "annee_sortie": 2010,
+   "annee_sortie_fr": 2011,
+   "ordre": 7,
+   "versions": [
+    {
+     "id": "noir",
+     "nom": "Noir",
+     "couleur": "#424242"
+    },
+    {
+     "id": "blanc",
+     "nom": "Blanc",
+     "couleur": "#bdbdbd"
+    }
+   ],
+   "fichier": "noir-blanc.json"
+  },
+  {
+   "id": "noir2-blanc2",
+   "nom": "Pokémon Noir 2 et Blanc 2",
+   "generation": 5,
+   "region": "Unys",
+   "annee_sortie": 2012,
+   "annee_sortie_fr": 2012,
+   "ordre": 8,
+   "versions": [
+    {
+     "id": "noir2",
+     "nom": "Noir 2",
+     "couleur": "#37474f"
+    },
+    {
+     "id": "blanc2",
+     "nom": "Blanc 2",
+     "couleur": "#cfd8dc"
+    }
+   ],
+   "fichier": "noir2-blanc2.json"
+  },
+  {
+   "id": "x-y",
+   "nom": "Pokémon X et Y",
+   "generation": 6,
+   "region": "Kalos",
+   "annee_sortie": 2013,
+   "annee_sortie_fr": 2013,
+   "ordre": 9,
+   "versions": [
+    {
+     "id": "x",
+     "nom": "X",
+     "couleur": "#1e88e5"
+    },
+    {
+     "id": "y",
+     "nom": "Y",
+     "couleur": "#e53935"
+    }
+   ],
+   "fichier": "x-y.json"
+  },
+  {
+   "id": "rubis-omega-saphir-alpha",
+   "nom": "Pokémon Rubis Oméga et Saphir Alpha",
+   "generation": 6,
+   "region": "Hoenn",
+   "annee_sortie": 2014,
+   "annee_sortie_fr": 2014,
+   "ordre": 10,
+   "versions": [
+    {
+     "id": "rubis-omega",
+     "nom": "Rubis Oméga",
+     "couleur": "#b71c1c"
+    },
+    {
+     "id": "saphir-alpha",
+     "nom": "Saphir Alpha",
+     "couleur": "#0d47a1"
+    }
+   ],
+   "fichier": "rubis-omega-saphir-alpha.json"
+  },
+  {
+   "id": "soleil-lune",
+   "nom": "Pokémon Soleil et Lune",
+   "generation": 7,
+   "region": "Alola",
+   "annee_sortie": 2016,
+   "annee_sortie_fr": 2016,
+   "ordre": 11,
+   "versions": [
+    {
+     "id": "soleil",
+     "nom": "Soleil",
+     "couleur": "#ff9800"
+    },
+    {
+     "id": "lune",
+     "nom": "Lune",
+     "couleur": "#5e35b1"
+    }
+   ],
+   "fichier": "soleil-lune.json"
+  },
+  {
+   "id": "ultra-soleil-ultra-lune",
+   "nom": "Pokémon Ultra-Soleil et Ultra-Lune",
+   "generation": 7,
+   "region": "Alola",
+   "annee_sortie": 2017,
+   "annee_sortie_fr": 2017,
+   "ordre": 12,
+   "versions": [
+    {
+     "id": "ultra-soleil",
+     "nom": "Ultra-Soleil",
+     "couleur": "#ef6c00"
+    },
+    {
+     "id": "ultra-lune",
+     "nom": "Ultra-Lune",
+     "couleur": "#4527a0"
+    }
+   ],
+   "fichier": "ultra-soleil-ultra-lune.json"
+  },
+  {
+   "id": "lets-go",
+   "nom": "Pokémon Let's Go, Pikachu et Let's Go, Évoli",
+   "generation": 7,
+   "region": "Kanto",
+   "annee_sortie": 2018,
+   "annee_sortie_fr": 2018,
+   "ordre": 13,
+   "versions": [
+    {
+     "id": "lets-go-pikachu",
+     "nom": "Let's Go, Pikachu",
+     "couleur": "#f9c80e"
+    },
+    {
+     "id": "lets-go-evoli",
+     "nom": "Let's Go, Évoli",
+     "couleur": "#a1662f"
+    }
+   ],
+   "fichier": "lets-go.json"
+  },
+  {
+   "id": "epee-bouclier",
+   "nom": "Pokémon Épée et Bouclier",
+   "generation": 8,
+   "region": "Galar",
+   "annee_sortie": 2019,
+   "annee_sortie_fr": 2019,
+   "ordre": 14,
+   "versions": [
+    {
+     "id": "epee",
+     "nom": "Épée",
+     "couleur": "#00a1e9"
+    },
+    {
+     "id": "bouclier",
+     "nom": "Bouclier",
+     "couleur": "#e4007f"
+    }
+   ],
+   "fichier": "epee-bouclier.json"
+  },
+  {
+   "id": "diamant-etincelant-perle-scintillante",
+   "nom": "Pokémon Diamant Étincelant et Perle Scintillante",
+   "generation": 8,
+   "region": "Sinnoh",
+   "annee_sortie": 2021,
+   "annee_sortie_fr": 2021,
+   "ordre": 15,
+   "versions": [
+    {
+     "id": "diamant-etincelant",
+     "nom": "Diamant Étincelant",
+     "couleur": "#4a7bd1"
+    },
+    {
+     "id": "perle-scintillante",
+     "nom": "Perle Scintillante",
+     "couleur": "#e27bb0"
+    }
+   ],
+   "fichier": "diamant-etincelant-perle-scintillante.json"
+  },
+  {
+   "id": "legendes-arceus",
+   "nom": "Légendes Pokémon : Arceus",
+   "generation": 8,
+   "region": "Hisui",
+   "annee_sortie": 2022,
+   "annee_sortie_fr": 2022,
+   "ordre": 16,
+   "versions": [
+    {
+     "id": "legendes-arceus",
+     "nom": "Légendes Arceus",
+     "couleur": "#8d6e63"
+    }
+   ],
+   "fichier": "legendes-arceus.json"
+  },
+  {
+   "id": "ecarlate-violet",
+   "nom": "Pokémon Écarlate et Violet",
+   "generation": 9,
+   "region": "Paldea",
+   "annee_sortie": 2022,
+   "annee_sortie_fr": 2022,
+   "ordre": 17,
+   "versions": [
+    {
+     "id": "ecarlate",
+     "nom": "Écarlate",
+     "couleur": "#d32f2f"
+    },
+    {
+     "id": "violet",
+     "nom": "Violet",
+     "couleur": "#7b1fa2"
+    }
+   ],
+   "fichier": "ecarlate-violet.json"
+  },
+  {
+   "id": "legendes-za",
+   "nom": "Légendes Pokémon : Z-A",
+   "generation": 9,
+   "region": "Kalos",
+   "annee_sortie": 2025,
+   "annee_sortie_fr": 2025,
+   "ordre": 18,
+   "versions": [
+    {
+     "id": "legendes-za",
+     "nom": "Légendes Z-A",
+     "couleur": "#26a69a"
+    }
+   ],
+   "fichier": "legendes-za.json"
   }
  ]
 }
