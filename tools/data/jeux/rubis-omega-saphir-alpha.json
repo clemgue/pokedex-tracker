@@ -1,0 +1,57 @@
+{
+  "id": "rubis-omega-saphir-alpha",
+  "nom": "Pokémon Rubis Oméga et Saphir Alpha",
+  "generation": 6,
+  "region": "Hoenn",
+  "annee_sortie": 2014,
+  "annee_sortie_fr": 2014,
+  "ordre": 10,
+  "versions": [
+    {
+      "id": "rubis-omega",
+      "nom": "Rubis Oméga",
+      "couleur": "#b71c1c",
+      "codes": [
+        "RuO",
+        "Ruo"
+      ],
+      "sprites_pokeapi": "omega-ruby-alpha-sapphire"
+    },
+    {
+      "id": "saphir-alpha",
+      "nom": "Saphir Alpha",
+      "couleur": "#0d47a1",
+      "codes": [
+        "SaA",
+        "Saa"
+      ],
+      "sprites_pokeapi": "omega-ruby-alpha-sapphire"
+    }
+  ],
+  "generation_pokeapi": "generation-vi",
+  "megas": true,
+  "pokedex": [
+    {
+      "id": "hoenn",
+      "nom": "Hoenn",
+      "pokeapi": "updated-hoenn"
+    },
+    {
+      "id": "national",
+      "nom": "National",
+      "pokeapi": "national",
+      "max": 721
+    }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Pokémon Rubis Oméga et Saphir Alpha",
+      "versions": [
+        "rubis-omega",
+        "saphir-alpha"
+      ]
+    }
+  ],
+  "ordre_lieux": [],
+  "corrections": {}
+}

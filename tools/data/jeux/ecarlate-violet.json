@@ -1,0 +1,58 @@
+{
+  "id": "ecarlate-violet",
+  "nom": "Pokémon Écarlate et Violet",
+  "generation": 9,
+  "region": "Paldea",
+  "annee_sortie": 2022,
+  "annee_sortie_fr": 2022,
+  "ordre": 17,
+  "versions": [
+    {
+      "id": "ecarlate",
+      "nom": "Écarlate",
+      "couleur": "#d32f2f",
+      "codes": [
+        "Ec"
+      ],
+      "sprites_pokeapi": "scarlet-violet"
+    },
+    {
+      "id": "violet",
+      "nom": "Violet",
+      "couleur": "#7b1fa2",
+      "codes": [
+        "Vi"
+      ],
+      "sprites_pokeapi": "scarlet-violet"
+    }
+  ],
+  "generation_pokeapi": "generation-ix",
+  "pokedex": [
+    {
+      "id": "paldea",
+      "nom": "Paldea",
+      "pokeapi": "paldea"
+    },
+    {
+      "id": "septentria",
+      "nom": "Septentria",
+      "pokeapi": "kitakami"
+    },
+    {
+      "id": "myrtille",
+      "nom": "Myrtille",
+      "pokeapi": "blueberry"
+    }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Pokémon Écarlate et Violet",
+      "versions": [
+        "ecarlate",
+        "violet"
+      ]
+    }
+  ],
+  "ordre_lieux": [],
+  "corrections": {}
+}

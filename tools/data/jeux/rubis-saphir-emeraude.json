@@ -1,0 +1,67 @@
+{
+  "id": "rubis-saphir-emeraude",
+  "nom": "Pokémon Rubis, Saphir et Émeraude",
+  "generation": 3,
+  "region": "Hoenn",
+  "annee_sortie": 2002,
+  "annee_sortie_fr": 2003,
+  "ordre": 3,
+  "versions": [
+    {
+      "id": "rubis",
+      "nom": "Rubis",
+      "couleur": "#c62828",
+      "codes": [
+        "Ru"
+      ],
+      "sprites_pokeapi": "ruby-sapphire"
+    },
+    {
+      "id": "saphir",
+      "nom": "Saphir",
+      "couleur": "#1565c0",
+      "codes": [
+        "Sa"
+      ],
+      "sprites_pokeapi": "ruby-sapphire"
+    },
+    {
+      "id": "emeraude",
+      "nom": "Émeraude",
+      "couleur": "#2e7d32",
+      "codes": [],
+      "sprites_pokeapi": "emerald"
+    }
+  ],
+  "generation_pokeapi": "generation-iii",
+  "pokedex": [
+    {
+      "id": "hoenn",
+      "nom": "Hoenn",
+      "pokeapi": "hoenn"
+    },
+    {
+      "id": "national",
+      "nom": "National",
+      "pokeapi": "national",
+      "max": 386
+    }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Pokémon Rubis et Saphir",
+      "versions": [
+        "rubis",
+        "saphir"
+      ]
+    },
+    {
+      "module": "Pokémon Émeraude",
+      "versions": [
+        "emeraude"
+      ]
+    }
+  ],
+  "ordre_lieux": [],
+  "corrections": {}
+}

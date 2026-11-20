@@ -6,6 +6,7 @@
 	import Evolutions from '$lib/composants/Evolutions.svelte';
 	import ListeObtentions from '$lib/composants/ListeObtentions.svelte';
 	import PuceMethode from '$lib/composants/PuceMethode.svelte';
+	import Variantes from '$lib/composants/Variantes.svelte';
 	import { numero, sprite } from '$lib/donnees';
 	import { etat } from '$lib/etat.svelte';
 
@@ -104,6 +105,13 @@
 		</div>
 		<ListeObtentions parLieu={fiche.parLieu} sansLieu={fiche.sansLieu} {donnees} lienInterne />
 	</section>
+
+	{#if fiche.pokemon.formes?.length}
+		<section>
+			<h2>Formes et Méga-évolutions</h2>
+			<Variantes pokemon={fiche.pokemon} />
+		</section>
+	{/if}
 
 	{#if evolution}
 		<section>

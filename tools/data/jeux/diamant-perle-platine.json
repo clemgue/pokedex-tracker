@@ -1,0 +1,72 @@
+{
+  "id": "diamant-perle-platine",
+  "nom": "Pokémon Diamant, Perle et Platine",
+  "generation": 4,
+  "region": "Sinnoh",
+  "annee_sortie": 2006,
+  "annee_sortie_fr": 2007,
+  "ordre": 5,
+  "versions": [
+    {
+      "id": "diamant",
+      "nom": "Diamant",
+      "couleur": "#5c6bc0",
+      "codes": [
+        "D"
+      ],
+      "sprites_pokeapi": "diamond-pearl"
+    },
+    {
+      "id": "perle",
+      "nom": "Perle",
+      "couleur": "#ec407a",
+      "codes": [
+        "P"
+      ],
+      "sprites_pokeapi": "diamond-pearl"
+    },
+    {
+      "id": "platine",
+      "nom": "Platine",
+      "couleur": "#78909c",
+      "codes": [],
+      "sprites_pokeapi": "platinum"
+    }
+  ],
+  "generation_pokeapi": "generation-iv",
+  "pokedex": [
+    {
+      "id": "sinnoh",
+      "nom": "Sinnoh",
+      "pokeapi": "original-sinnoh"
+    },
+    {
+      "id": "sinnoh-platine",
+      "nom": "Sinnoh (Platine)",
+      "pokeapi": "extended-sinnoh"
+    },
+    {
+      "id": "national",
+      "nom": "National",
+      "pokeapi": "national",
+      "max": 493
+    }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Pokémon Diamant et Perle",
+      "versions": [
+        "diamant",
+        "perle"
+      ]
+    },
+    {
+      "module": "Pokémon Platine",
+      "versions": [
+        "platine"
+      ]
+    }
+  ],
+  "ordre_lieux": [],
+  "corrections": {}
+}

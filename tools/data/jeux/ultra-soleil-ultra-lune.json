@@ -1,0 +1,55 @@
+{
+  "id": "ultra-soleil-ultra-lune",
+  "nom": "Pokémon Ultra-Soleil et Ultra-Lune",
+  "generation": 7,
+  "region": "Alola",
+  "annee_sortie": 2017,
+  "annee_sortie_fr": 2017,
+  "ordre": 12,
+  "versions": [
+    {
+      "id": "ultra-soleil",
+      "nom": "Ultra-Soleil",
+      "couleur": "#ef6c00",
+      "codes": [
+        "US"
+      ],
+      "sprites_pokeapi": "ultra-sun-ultra-moon"
+    },
+    {
+      "id": "ultra-lune",
+      "nom": "Ultra-Lune",
+      "couleur": "#4527a0",
+      "codes": [
+        "UL"
+      ],
+      "sprites_pokeapi": "ultra-sun-ultra-moon"
+    }
+  ],
+  "generation_pokeapi": "generation-vii",
+  "megas": true,
+  "pokedex": [
+    {
+      "id": "alola",
+      "nom": "Alola",
+      "pokeapi": "updated-alola"
+    },
+    {
+      "id": "national",
+      "nom": "National",
+      "pokeapi": "national",
+      "max": 809
+    }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Pokémon Ultra-Soleil et Ultra-Lune",
+      "versions": [
+        "ultra-soleil",
+        "ultra-lune"
+      ]
+    }
+  ],
+  "ordre_lieux": [],
+  "corrections": {}
+}

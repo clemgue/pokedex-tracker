@@ -1,0 +1,67 @@
+{
+  "id": "or-argent-cristal",
+  "nom": "Pokémon Or, Argent et Cristal",
+  "generation": 2,
+  "region": "Johto",
+  "annee_sortie": 1999,
+  "annee_sortie_fr": 2001,
+  "ordre": 2,
+  "versions": [
+    {
+      "id": "or",
+      "nom": "Or",
+      "couleur": "#c9a227",
+      "codes": [
+        "O"
+      ],
+      "sprites_pokeapi": "gold"
+    },
+    {
+      "id": "argent",
+      "nom": "Argent",
+      "couleur": "#9aa5b1",
+      "codes": [
+        "A"
+      ],
+      "sprites_pokeapi": "silver"
+    },
+    {
+      "id": "cristal",
+      "nom": "Cristal",
+      "couleur": "#4fc3f7",
+      "codes": [],
+      "sprites_pokeapi": "crystal"
+    }
+  ],
+  "generation_pokeapi": "generation-ii",
+  "pokedex": [
+    {
+      "id": "johto",
+      "nom": "Johto",
+      "pokeapi": "original-johto"
+    },
+    {
+      "id": "national",
+      "nom": "National",
+      "pokeapi": "national",
+      "max": 251
+    }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Pokémon Or et Argent",
+      "versions": [
+        "or",
+        "argent"
+      ]
+    },
+    {
+      "module": "Pokémon Cristal",
+      "versions": [
+        "cristal"
+      ]
+    }
+  ],
+  "ordre_lieux": [],
+  "corrections": {}
+}

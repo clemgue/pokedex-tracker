@@ -1,0 +1,65 @@
+{
+  "id": "x-y",
+  "nom": "Pokémon X et Y",
+  "generation": 6,
+  "region": "Kalos",
+  "annee_sortie": 2013,
+  "annee_sortie_fr": 2013,
+  "ordre": 9,
+  "versions": [
+    {
+      "id": "x",
+      "nom": "X",
+      "couleur": "#1e88e5",
+      "codes": [
+        "X"
+      ],
+      "sprites_pokeapi": "x-y"
+    },
+    {
+      "id": "y",
+      "nom": "Y",
+      "couleur": "#e53935",
+      "codes": [
+        "Y"
+      ],
+      "sprites_pokeapi": "x-y"
+    }
+  ],
+  "generation_pokeapi": "generation-vi",
+  "megas": true,
+  "pokedex": [
+    {
+      "id": "kalos-centre",
+      "nom": "Kalos Centre",
+      "pokeapi": "kalos-central"
+    },
+    {
+      "id": "kalos-cote",
+      "nom": "Kalos Côte",
+      "pokeapi": "kalos-coastal"
+    },
+    {
+      "id": "kalos-montagne",
+      "nom": "Kalos Montagne",
+      "pokeapi": "kalos-mountain"
+    },
+    {
+      "id": "national",
+      "nom": "National",
+      "pokeapi": "national",
+      "max": 721
+    }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Pokémon X et Y",
+      "versions": [
+        "x",
+        "y"
+      ]
+    }
+  ],
+  "ordre_lieux": [],
+  "corrections": {}
+}

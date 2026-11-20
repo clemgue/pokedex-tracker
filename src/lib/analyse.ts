@@ -116,8 +116,23 @@ function resumer(parLieu: GroupeLieu[], sansLieu: Obtention[], donnees: DonneesJ
  * Description d'une obtention : « Pêche (Méga Canne) · Sur les quais · niv. 15 · 25 % ».
  * `avecMethode: false` omet le nom de la méthode (déjà affiché par une pastille).
  */
+const indexPokemon = new WeakMap<DonneesJeu, Map<number, Pokemon>>();
+
+/** Nom de la forme concernée par une obtention (ex. « Galar »), si elle en précise une. */
+export function nomForme(o: Obtention, donnees: DonneesJeu): string | null {
+	if (!o.forme) return null;
+	let index = indexPokemon.get(donnees);
+	if (!index) {
+		index = new Map(donnees.pokemon.map((p) => [p.id, p]));
+		indexPokemon.set(donnees, index);
+	}
+	return index.get(o.pokemon)?.formes?.find((f) => f.id === o.forme)?.nom ?? o.forme;
+}
+
 export function decrire(o: Obtention, donnees: DonneesJeu, avecMethode = true): string {
 	const parties: string[] = [];
+	const forme = nomForme(o, donnees);
+	if (forme) parties.push(`Forme ${forme}`);
 	const methode = donnees.methodes[o.methode];
 	if (o.methode === 'evolution' || o.methode === 'echange_version' || o.methode === 'evenement') {
 		parties.push(o.detail ?? methode);

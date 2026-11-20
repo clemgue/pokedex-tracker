@@ -1,0 +1,54 @@
+{
+  "id": "noir2-blanc2",
+  "nom": "Pokémon Noir 2 et Blanc 2",
+  "generation": 5,
+  "region": "Unys",
+  "annee_sortie": 2012,
+  "annee_sortie_fr": 2012,
+  "ordre": 8,
+  "versions": [
+    {
+      "id": "noir2",
+      "nom": "Noir 2",
+      "couleur": "#37474f",
+      "codes": [
+        "No2"
+      ],
+      "sprites_pokeapi": "black-white"
+    },
+    {
+      "id": "blanc2",
+      "nom": "Blanc 2",
+      "couleur": "#cfd8dc",
+      "codes": [
+        "Bl2"
+      ],
+      "sprites_pokeapi": "black-white"
+    }
+  ],
+  "generation_pokeapi": "generation-v",
+  "pokedex": [
+    {
+      "id": "unys",
+      "nom": "Unys",
+      "pokeapi": "updated-unova"
+    },
+    {
+      "id": "national",
+      "nom": "National",
+      "pokeapi": "national",
+      "max": 649
+    }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Pokémon Noir 2 et Blanc 2",
+      "versions": [
+        "noir2",
+        "blanc2"
+      ]
+    }
+  ],
+  "ordre_lieux": [],
+  "corrections": {}
+}

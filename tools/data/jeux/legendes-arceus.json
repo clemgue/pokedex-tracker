@@ -1,0 +1,36 @@
+{
+  "id": "legendes-arceus",
+  "nom": "Légendes Pokémon : Arceus",
+  "generation": 8,
+  "region": "Hisui",
+  "annee_sortie": 2022,
+  "annee_sortie_fr": 2022,
+  "ordre": 16,
+  "versions": [
+    {
+      "id": "legendes-arceus",
+      "nom": "Légendes Arceus",
+      "couleur": "#8d6e63",
+      "codes": [],
+      "sprites_pokeapi": "legends-arceus"
+    }
+  ],
+  "generation_pokeapi": "generation-viii",
+  "pokedex": [
+    {
+      "id": "hisui",
+      "nom": "Hisui",
+      "pokeapi": "hisui"
+    }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Légendes Pokémon : Arceus",
+      "versions": [
+        "legendes-arceus"
+      ]
+    }
+  ],
+  "ordre_lieux": [],
+  "corrections": {}
+}

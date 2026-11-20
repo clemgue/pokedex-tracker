@@ -1,0 +1,58 @@
+{
+  "id": "epee-bouclier",
+  "nom": "Pokémon Épée et Bouclier",
+  "generation": 8,
+  "region": "Galar",
+  "annee_sortie": 2019,
+  "annee_sortie_fr": 2019,
+  "ordre": 14,
+  "versions": [
+    {
+      "id": "epee",
+      "nom": "Épée",
+      "couleur": "#00a1e9",
+      "codes": [
+        "Ep"
+      ],
+      "sprites_pokeapi": "sword-shield"
+    },
+    {
+      "id": "bouclier",
+      "nom": "Bouclier",
+      "couleur": "#e4007f",
+      "codes": [
+        "Bo"
+      ],
+      "sprites_pokeapi": "sword-shield"
+    }
+  ],
+  "generation_pokeapi": "generation-viii",
+  "pokedex": [
+    {
+      "id": "galar",
+      "nom": "Galar",
+      "pokeapi": "galar"
+    },
+    {
+      "id": "ile-armure",
+      "nom": "Isolarmure",
+      "pokeapi": "isle-of-armor"
+    },
+    {
+      "id": "terres-enneigees",
+      "nom": "Couronneige",
+      "pokeapi": "crown-tundra"
+    }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Pokémon Épée et Bouclier",
+      "versions": [
+        "epee",
+        "bouclier"
+      ]
+    }
+  ],
+  "ordre_lieux": [],
+  "corrections": {}
+}

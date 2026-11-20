@@ -39,6 +39,22 @@
 
 	let nbShiny = $derived(partie ? Object.values(partie.captures).filter((c) => c.shiny).length : 0);
 
+	/** Formes et Méga-évolutions : obtenues / total, par type */
+	function compterVariantes(type: 'forme' | 'mega') {
+		let total = 0;
+		let obtenues = 0;
+		for (const f of fiches) {
+			for (const x of f.pokemon.formes ?? []) {
+				if (x.type !== type) continue;
+				total++;
+				if (partie?.captures[f.pokemon.id]?.formes?.[x.id]) obtenues++;
+			}
+		}
+		return { total, obtenues };
+	}
+	let formes = $derived(compterVariantes('forme'));
+	let megasCompte = $derived(compterVariantes('mega'));
+
 	function pourcent(n: number, total: number) {
 		return total ? Math.round((n / total) * 100) : 0;
 	}
@@ -69,6 +85,18 @@
 			<div class="tuile">
 				<span class="titre">Chromatiques</span>
 				<span class="valeur">{nbShiny}</span>
+			</div>
+		{/if}
+		{#if formes.total}
+			<div class="tuile">
+				<span class="titre">Formes</span>
+				<span class="valeur">{formes.obtenues}<small> / {formes.total}</small></span>
+			</div>
+		{/if}
+		{#if megasCompte.total}
+			<div class="tuile">
+				<span class="titre">Méga-Gemmes</span>
+				<span class="valeur">{megasCompte.obtenues}<small> / {megasCompte.total}</small></span>
 			</div>
 		{/if}
 	</section>

@@ -1,0 +1,54 @@
+{
+  "id": "noir-blanc",
+  "nom": "Pokémon Noir et Blanc",
+  "generation": 5,
+  "region": "Unys",
+  "annee_sortie": 2010,
+  "annee_sortie_fr": 2011,
+  "ordre": 7,
+  "versions": [
+    {
+      "id": "noir",
+      "nom": "Noir",
+      "couleur": "#424242",
+      "codes": [
+        "No"
+      ],
+      "sprites_pokeapi": "black-white"
+    },
+    {
+      "id": "blanc",
+      "nom": "Blanc",
+      "couleur": "#bdbdbd",
+      "codes": [
+        "Bl"
+      ],
+      "sprites_pokeapi": "black-white"
+    }
+  ],
+  "generation_pokeapi": "generation-v",
+  "pokedex": [
+    {
+      "id": "unys",
+      "nom": "Unys",
+      "pokeapi": "original-unova"
+    },
+    {
+      "id": "national",
+      "nom": "National",
+      "pokeapi": "national",
+      "max": 649
+    }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Pokémon Noir et Blanc",
+      "versions": [
+        "noir",
+        "blanc"
+      ]
+    }
+  ],
+  "ordre_lieux": [],
+  "corrections": {}
+}

@@ -1,0 +1,42 @@
+{
+  "id": "legendes-za",
+  "nom": "Légendes Pokémon : Z-A",
+  "generation": 9,
+  "region": "Kalos",
+  "annee_sortie": 2025,
+  "annee_sortie_fr": 2025,
+  "ordre": 18,
+  "versions": [
+    {
+      "id": "legendes-za",
+      "nom": "Légendes Z-A",
+      "couleur": "#26a69a",
+      "codes": [],
+      "sprites_pokeapi": "legends-za"
+    }
+  ],
+  "generation_pokeapi": "generation-ix",
+  "megas": true,
+  "pokedex": [
+    {
+      "id": "illumis",
+      "nom": "Illumis",
+      "pokeapi": "lumiose-city"
+    },
+    {
+      "id": "hyperespace",
+      "nom": "Hyperespace",
+      "pokeapi": "hyperspace"
+    }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Légendes Pokémon : Z-A",
+      "versions": [
+        "legendes-za"
+      ]
+    }
+  ],
+  "ordre_lieux": [],
+  "corrections": {}
+}

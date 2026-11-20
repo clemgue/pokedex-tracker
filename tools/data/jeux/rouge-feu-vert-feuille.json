@@ -1,0 +1,54 @@
+{
+  "id": "rouge-feu-vert-feuille",
+  "nom": "Pokémon Rouge Feu et Vert Feuille",
+  "generation": 3,
+  "region": "Kanto",
+  "annee_sortie": 2004,
+  "annee_sortie_fr": 2004,
+  "ordre": 4,
+  "versions": [
+    {
+      "id": "rouge-feu",
+      "nom": "Rouge Feu",
+      "couleur": "#e65100",
+      "codes": [
+        "RF"
+      ],
+      "sprites_pokeapi": "firered-leafgreen"
+    },
+    {
+      "id": "vert-feuille",
+      "nom": "Vert Feuille",
+      "couleur": "#43a047",
+      "codes": [
+        "VF"
+      ],
+      "sprites_pokeapi": "firered-leafgreen"
+    }
+  ],
+  "generation_pokeapi": "generation-iii",
+  "pokedex": [
+    {
+      "id": "kanto",
+      "nom": "Kanto",
+      "pokeapi": "kanto"
+    },
+    {
+      "id": "national",
+      "nom": "National",
+      "pokeapi": "national",
+      "max": 386
+    }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Pokémon Rouge Feu et Vert Feuille",
+      "versions": [
+        "rouge-feu",
+        "vert-feuille"
+      ]
+    }
+  ],
+  "ordre_lieux": [],
+  "corrections": {}
+}

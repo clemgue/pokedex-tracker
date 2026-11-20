@@ -203,6 +203,15 @@
 							{#each f.pokemon.types as t (t)}
 								<BadgeType type={t} />
 							{/each}
+							{#if etat.capture(f.pokemon.id)?.shiny}
+								<span class="chroma" title="Chromatique obtenu" aria-label="Chromatique obtenu">★</span>
+							{/if}
+							{#if f.pokemon.formes?.length}
+								{@const obtenues = f.pokemon.formes.filter((x) => etat.capture(f.pokemon.id)?.formes?.[x.id]).length}
+								<span class="nb-formes" title="Formes et Méga-évolutions obtenues"
+									>{obtenues}/{f.pokemon.formes.length} formes</span
+								>
+							{/if}
 							{#if f.exclusif}
 								<span class="etiquette-ex" title="Absent d'au moins une autre version">Exclusif</span>
 							{/if}
@@ -450,6 +459,15 @@
 	}
 	.lien-fiche:hover {
 		text-decoration: underline;
+	}
+	.chroma {
+		color: var(--voyant-jaune);
+		text-shadow: 0 0 2px rgb(0 0 0 / 0.6);
+	}
+	.nb-formes {
+		font-size: 0.7rem;
+		font-weight: 600;
+		color: var(--ecran-texte-doux);
 	}
 	.etiquette-ex {
 		padding: 0 6px;

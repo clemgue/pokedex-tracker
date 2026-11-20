@@ -1,0 +1,54 @@
+{
+  "id": "diamant-etincelant-perle-scintillante",
+  "nom": "Pokémon Diamant Étincelant et Perle Scintillante",
+  "generation": 8,
+  "region": "Sinnoh",
+  "annee_sortie": 2021,
+  "annee_sortie_fr": 2021,
+  "ordre": 15,
+  "versions": [
+    {
+      "id": "diamant-etincelant",
+      "nom": "Diamant Étincelant",
+      "couleur": "#4a7bd1",
+      "codes": [
+        "DE"
+      ],
+      "sprites_pokeapi": "brilliant-diamond-shining-pearl"
+    },
+    {
+      "id": "perle-scintillante",
+      "nom": "Perle Scintillante",
+      "couleur": "#e27bb0",
+      "codes": [
+        "PS"
+      ],
+      "sprites_pokeapi": "brilliant-diamond-shining-pearl"
+    }
+  ],
+  "generation_pokeapi": "generation-viii",
+  "pokedex": [
+    {
+      "id": "sinnoh",
+      "nom": "Sinnoh",
+      "pokeapi": "original-sinnoh"
+    },
+    {
+      "id": "national",
+      "nom": "National",
+      "pokeapi": "national",
+      "max": 493
+    }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Pokémon Diamant Étincelant et Perle Scintillante",
+      "versions": [
+        "diamant-etincelant",
+        "perle-scintillante"
+      ]
+    }
+  ],
+  "ordre_lieux": [],
+  "corrections": {}
+}

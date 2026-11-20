@@ -1,0 +1,49 @@
+{
+  "id": "lets-go",
+  "nom": "Pokémon Let's Go, Pikachu et Let's Go, Évoli",
+  "generation": 7,
+  "region": "Kanto",
+  "annee_sortie": 2018,
+  "annee_sortie_fr": 2018,
+  "ordre": 13,
+  "versions": [
+    {
+      "id": "lets-go-pikachu",
+      "nom": "Let's Go, Pikachu",
+      "couleur": "#f9c80e",
+      "codes": [
+        "LGP"
+      ],
+      "sprites_pokeapi": "lets-go-pikachu-lets-go-eevee"
+    },
+    {
+      "id": "lets-go-evoli",
+      "nom": "Let's Go, Évoli",
+      "couleur": "#a1662f",
+      "codes": [
+        "LGE"
+      ],
+      "sprites_pokeapi": "lets-go-pikachu-lets-go-eevee"
+    }
+  ],
+  "generation_pokeapi": "generation-vii",
+  "megas": true,
+  "pokedex": [
+    {
+      "id": "kanto",
+      "nom": "Kanto",
+      "pokeapi": "letsgo-kanto"
+    }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Pokémon Let's Go, Pikachu et Let's Go, Évoli",
+      "versions": [
+        "lets-go-pikachu",
+        "lets-go-evoli"
+      ]
+    }
+  ],
+  "ordre_lieux": [],
+  "corrections": {}
+}

@@ -1,0 +1,54 @@
+{
+  "id": "heartgold-soulsilver",
+  "nom": "Pokémon Or HeartGold et Argent SoulSilver",
+  "generation": 4,
+  "region": "Johto",
+  "annee_sortie": 2009,
+  "annee_sortie_fr": 2010,
+  "ordre": 6,
+  "versions": [
+    {
+      "id": "heartgold",
+      "nom": "Or HeartGold",
+      "couleur": "#d4a017",
+      "codes": [
+        "HG"
+      ],
+      "sprites_pokeapi": "heartgold-soulsilver"
+    },
+    {
+      "id": "soulsilver",
+      "nom": "Argent SoulSilver",
+      "couleur": "#90a4ae",
+      "codes": [
+        "SS"
+      ],
+      "sprites_pokeapi": "heartgold-soulsilver"
+    }
+  ],
+  "generation_pokeapi": "generation-iv",
+  "pokedex": [
+    {
+      "id": "johto",
+      "nom": "Johto",
+      "pokeapi": "updated-johto"
+    },
+    {
+      "id": "national",
+      "nom": "National",
+      "pokeapi": "national",
+      "max": 493
+    }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Pokémon Or HeartGold et Argent SoulSilver",
+      "versions": [
+        "heartgold",
+        "soulsilver"
+      ]
+    }
+  ],
+  "ordre_lieux": [],
+  "corrections": {}
+}

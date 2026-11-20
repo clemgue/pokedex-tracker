@@ -1,0 +1,55 @@
+{
+  "id": "soleil-lune",
+  "nom": "Pokémon Soleil et Lune",
+  "generation": 7,
+  "region": "Alola",
+  "annee_sortie": 2016,
+  "annee_sortie_fr": 2016,
+  "ordre": 11,
+  "versions": [
+    {
+      "id": "soleil",
+      "nom": "Soleil",
+      "couleur": "#ff9800",
+      "codes": [
+        "So"
+      ],
+      "sprites_pokeapi": null
+    },
+    {
+      "id": "lune",
+      "nom": "Lune",
+      "couleur": "#5e35b1",
+      "codes": [
+        "Lu"
+      ],
+      "sprites_pokeapi": null
+    }
+  ],
+  "generation_pokeapi": "generation-vii",
+  "megas": true,
+  "pokedex": [
+    {
+      "id": "alola",
+      "nom": "Alola",
+      "pokeapi": "original-alola"
+    },
+    {
+      "id": "national",
+      "nom": "National",
+      "pokeapi": "national",
+      "max": 809
+    }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Pokémon Soleil et Lune",
+      "versions": [
+        "soleil",
+        "lune"
+      ]
+    }
+  ],
+  "ordre_lieux": [],
+  "corrections": {}
+}
