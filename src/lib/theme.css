@@ -1,0 +1,239 @@
+/* ==========================================================================
+   Thème « Pokédex »
+   Toutes les couleurs passent par ces variables : pour retravailler le style,
+   il suffit de modifier ce bloc (les composants n'utilisent que var(--…)).
+   ========================================================================== */
+
+:root {
+	color-scheme: light;
+
+	/* Coque */
+	--coque: #c8102e;
+	--coque-fonce: #8f0c22;
+	--coque-clair: #e5384f;
+	--coque-texte: #ffffff;
+
+	/* Lentille et voyants */
+	--lentille: #2a8fe0;
+	--lentille-clair: #9fd6ff;
+	--voyant-rouge: #ff4d4d;
+	--voyant-jaune: #ffd23f;
+	--voyant-vert: #4cd964;
+
+	/* Cadre de l'écran */
+	--cadre: #e4e4e4;
+	--cadre-ombre: #a9a9a9;
+
+	/* Écran */
+	--ecran: #e9f1e4;
+	--ecran-alt: #dde8d7;
+	--ecran-texte: #18261b;
+	--ecran-texte-doux: #56685a;
+	--ecran-ligne: #c4d3bf;
+	--ecran-survol: #d3e2cc;
+
+	/* Commandes */
+	--bouton: #2f3437;
+	--bouton-texte: #f4f4f4;
+	--bouton-survol: #454c50;
+	--champ: #ffffff;
+	--champ-texte: #18261b;
+	--champ-bord: #9fb39a;
+
+	/* États */
+	--attrape: #c8102e;
+	--progression: #2fa84f;
+	--alerte: #b3261e;
+
+	/* Familles de méthodes de capture (pastilles) */
+	--famille-sauvage: #2f9e44;
+	--famille-cadeau: #8e44ad;
+	--famille-evolution: #e67700;
+	--famille-echange: #d6336c;
+
+	/* Page */
+	--fond: #3a0610;
+	--fond-motif: #4a0a17;
+
+	/* Types */
+	--type-normal: #9fa19f;
+	--type-feu: #e62829;
+	--type-eau: #2980ef;
+	--type-plante: #3fa129;
+	--type-electrik: #f4c400;
+	--type-glace: #3dcef3;
+	--type-combat: #ff8000;
+	--type-poison: #9141cb;
+	--type-sol: #915121;
+	--type-vol: #81b9ef;
+	--type-psy: #ef4179;
+	--type-insecte: #91a119;
+	--type-roche: #afa981;
+	--type-spectre: #704170;
+	--type-dragon: #5060e1;
+	--type-tenebres: #624d4e;
+	--type-acier: #60a1b8;
+	--type-fee: #ef70ef;
+
+	--rayon: 10px;
+	--police: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+	--police-ecran: ui-monospace, 'Cascadia Mono', Consolas, 'Courier New', monospace;
+}
+
+/* Sombre : réglage de l'appareil, sauf choix explicite « clair » */
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='clair']) {
+		color-scheme: dark;
+		--coque: #9d0c24;
+		--coque-fonce: #5e0715;
+		--coque-clair: #c0203a;
+		--cadre: #3b3d42;
+		--cadre-ombre: #1c1d20;
+		--ecran: #101914;
+		--ecran-alt: #15211a;
+		--ecran-texte: #c3f0cc;
+		--ecran-texte-doux: #7fa58a;
+		--ecran-ligne: #233529;
+		--ecran-survol: #1c2c22;
+		--bouton: #c3f0cc;
+		--bouton-texte: #101914;
+		--bouton-survol: #e2fbe7;
+		--champ: #0b120e;
+		--champ-texte: #c3f0cc;
+		--champ-bord: #2f4a37;
+		--attrape: #ff5a6e;
+		--progression: #4cd964;
+		--alerte: #ff8a80;
+		--fond: #0b0b0d;
+		--fond-motif: #141418;
+	}
+}
+
+/* Sombre : choix explicite */
+:root[data-theme='sombre'] {
+	color-scheme: dark;
+	--coque: #9d0c24;
+	--coque-fonce: #5e0715;
+	--coque-clair: #c0203a;
+	--cadre: #3b3d42;
+	--cadre-ombre: #1c1d20;
+	--ecran: #101914;
+	--ecran-alt: #15211a;
+	--ecran-texte: #c3f0cc;
+	--ecran-texte-doux: #7fa58a;
+	--ecran-ligne: #233529;
+	--ecran-survol: #1c2c22;
+	--bouton: #c3f0cc;
+	--bouton-texte: #101914;
+	--bouton-survol: #e2fbe7;
+	--champ: #0b120e;
+	--champ-texte: #c3f0cc;
+	--champ-bord: #2f4a37;
+	--attrape: #ff5a6e;
+	--progression: #4cd964;
+	--alerte: #ff8a80;
+	--fond: #0b0b0d;
+	--fond-motif: #141418;
+}
+
+/* --- Base ------------------------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	margin: 0;
+	min-height: 100vh;
+	font-family: var(--police);
+	color: var(--ecran-texte);
+	background-color: var(--fond);
+	background-image: radial-gradient(var(--fond-motif) 1px, transparent 1px);
+	background-size: 14px 14px;
+}
+
+a {
+	color: inherit;
+}
+
+button,
+input,
+select {
+	font: inherit;
+	color: inherit;
+}
+
+:focus-visible {
+	outline: 3px solid var(--lentille);
+	outline-offset: 2px;
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+}
+
+/* --- Commandes communes ------------------------------------------------------ */
+
+.bouton {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	min-height: 40px;
+	padding: 0 16px;
+	border: 0;
+	border-radius: 999px;
+	background: var(--bouton);
+	color: var(--bouton-texte);
+	font-weight: 600;
+	text-decoration: none;
+	cursor: pointer;
+	box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.25);
+}
+
+.bouton:hover {
+	background: var(--bouton-survol);
+}
+
+.bouton.secondaire {
+	background: transparent;
+	color: var(--ecran-texte);
+	box-shadow: inset 0 0 0 2px var(--champ-bord);
+}
+
+.bouton.danger {
+	background: var(--alerte);
+	color: #fff;
+}
+
+.champ {
+	min-height: 40px;
+	width: 100%;
+	padding: 0 12px;
+	border: 2px solid var(--champ-bord);
+	border-radius: 8px;
+	background: var(--champ);
+	color: var(--champ-texte);
+}
+
+.etiquette {
+	display: block;
+	padding: 0;
+	margin-bottom: 4px;
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--ecran-texte-doux);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}

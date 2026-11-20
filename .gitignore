@@ -1,0 +1,9 @@
+tools/data/.cache/
+__pycache__/
+*.pyc
+node_modules/
+.svelte-kit/
+dist/
+build/
+.DS_Store
+Thumbs.db

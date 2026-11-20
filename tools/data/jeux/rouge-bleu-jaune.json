@@ -1,0 +1,113 @@
+{
+  "id": "rouge-bleu-jaune",
+  "nom": "Pokémon Rouge, Bleu et Jaune",
+  "generation": 1,
+  "region": "Kanto",
+  "annee_sortie": 1996,
+  "annee_sortie_fr": 1999,
+  "ordre": 1,
+  "versions": [
+    { "id": "rouge", "nom": "Rouge", "couleur": "#e3350d", "sprites_pokeapi": "red-blue" },
+    { "id": "bleu", "nom": "Bleu", "couleur": "#3b6fd8", "sprites_pokeapi": "red-blue" },
+    { "id": "jaune", "nom": "Jaune", "couleur": "#f5c518", "sprites_pokeapi": "yellow" }
+  ],
+  "generation_pokeapi": "generation-i",
+  "pokedex": [
+    { "id": "kanto", "nom": "Kanto", "pokeapi": "kanto" }
+  ],
+  "sources_pokepedia": [
+    {
+      "module": "Pokémon Rouge et Bleu",
+      "versions": ["rouge", "bleu"],
+      "codes": { "R": "rouge", "B": "bleu" }
+    },
+    {
+      "module": "Pokémon Jaune",
+      "versions": ["jaune"],
+      "codes": { "J": "jaune" }
+    }
+  ],
+  "ordre_lieux": [
+    "Bourg Palette",
+    "Laboratoire Pokémon du Professeur Chen",
+    "Route 1 (Kanto)",
+    "Jadielle",
+    "Route 22 (Kanto)",
+    "Route 2 (Kanto)",
+    "Forêt de Jade",
+    "Route 3 (Kanto)",
+    "Mont Sélénite",
+    "Route 4 (Kanto)",
+    "Azuria",
+    "Arène d'Azuria",
+    "Route 24 (Kanto)",
+    "Route 25 (Kanto)",
+    "Route 5 (Kanto)",
+    "Souterrain (Azuria ⇄ Carmin sur Mer)",
+    "Route 6 (Kanto)",
+    "Carmin sur Mer",
+    "Route 11 (Kanto)",
+    "Grotte Taupiqueur",
+    "Route 9 (Kanto)",
+    "Route 10 (Kanto)",
+    "Grotte Sombre",
+    "Tour Pokémon",
+    "Route 8 (Kanto)",
+    "Route 7 (Kanto)",
+    "Céladopole",
+    "Casino de Céladopole",
+    "Résidence Céladon",
+    "Route 16 (Kanto)",
+    "Route 17 (Kanto)",
+    "Route 18 (Kanto)",
+    "Route 12 (Kanto)",
+    "Route 13 (Kanto)",
+    "Route 14 (Kanto)",
+    "Route 15 (Kanto)",
+    "Parmanie",
+    "Parc Safari (Kanto)",
+    "Sylphe SARL",
+    "Dojo de Safrania",
+    "Chenal 19 (Kanto)",
+    "Chenal 20 (Kanto)",
+    "Îles Écume",
+    "Cramois'Île",
+    "Laboratoire de Cramois'Île",
+    "Manoir Pokémon (Kanto)",
+    "Chenal 21 (Kanto)",
+    "Centrale abandonnée",
+    "Route 23 (Kanto)",
+    "Route Victoire (Kanto)",
+    "Caverne Azurée"
+  ],
+  "corrections": {
+    "exclure": [
+      {
+        "lieu": "Tour Pokémon",
+        "pokemon": "Ossatueur",
+        "raison": "Ossatueur fantôme : combat scénarisé, ne peut pas être capturé."
+      }
+    ],
+    "ecarts_pokepedia_connus": [
+      { "module": "Pokémon Jaune", "pokemon": "Goupix", "raison": "Listé « Échange » dans Indisponibles, mais vendu au Casino de Céladopole (1000 jetons) selon les localisations." },
+      { "module": "Pokémon Jaune", "pokemon": "Feunard", "raison": "Évolution de Goupix, obtenable au Casino." },
+      { "module": "Pokémon Jaune", "pokemon": "Paras", "raison": "Listé « Échange » dans Indisponibles, mais présent au Mont Sélénite et au Parc Safari selon les localisations." }
+    ],
+    "evolutions_impossibles": [
+      {
+        "de": "Pikachu",
+        "vers": "Raichu",
+        "versions": ["jaune"],
+        "raison": "Le seul Pikachu de Jaune est celui de départ, qui refuse la Pierre Foudre."
+      }
+    ],
+    "ajouter": [
+      {
+        "pokemon": "Mew",
+        "methode": "evenement",
+        "detail": "Distribution officielle lors d'événements",
+        "versions": ["rouge", "bleu", "jaune"]
+      }
+    ]
+  }
+}

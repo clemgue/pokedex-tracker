@@ -1,0 +1,31 @@
+{
+ "jeux": [
+  {
+   "id": "rouge-bleu-jaune",
+   "nom": "Pokémon Rouge, Bleu et Jaune",
+   "generation": 1,
+   "region": "Kanto",
+   "annee_sortie": 1996,
+   "annee_sortie_fr": 1999,
+   "ordre": 1,
+   "versions": [
+    {
+     "id": "rouge",
+     "nom": "Rouge",
+     "couleur": "#e3350d"
+    },
+    {
+     "id": "bleu",
+     "nom": "Bleu",
+     "couleur": "#3b6fd8"
+    },
+    {
+     "id": "jaune",
+     "nom": "Jaune",
+     "couleur": "#f5c518"
+    }
+   ],
+   "fichier": "rouge-bleu-jaune.json"
+  }
+ ]
+}
