@@ -27,6 +27,32 @@ Pour GitHub Pages (site servi depuis `/<dépôt>/`) :
 $env:BASE_PATH = '/pokedex-tracker'; npm run build
 ```
 
+## Publier sur GitHub Pages
+
+Le workflow [.github/workflows/deploiement.yml](.github/workflows/deploiement.yml) vérifie, teste,
+construit et publie le site à chaque envoi sur `main`.
+
+1. Créer un dépôt GitHub (ex. `pokedex-tracker`) et y envoyer ce dépôt local :
+   `git remote add origin https://github.com/<compte>/pokedex-tracker.git` puis `git push -u origin main`.
+2. Sur GitHub : **Settings → Pages → Source : GitHub Actions**.
+3. Le site est publié à `https://<compte>.github.io/pokedex-tracker/`.
+4. (Optionnel) **Settings → Secrets and variables → Actions → Variables** : `DROPBOX_APP_KEY` = clé
+   d'application Dropbox, pour qu'elle soit préremplie (sinon, la saisir dans *Réglages*).
+5. Ajouter `https://<compte>.github.io/pokedex-tracker/` aux *Redirect URIs* de l'application Dropbox.
+
+## Synchronisation Dropbox
+
+La progression est un fichier `progression.json` dans le dossier d'application Dropbox. Il faut créer
+une fois une application Dropbox (*Scoped access*, *App folder*, permissions `files.content.read` et
+`files.content.write`, Redirect URIs = adresses du site) : la marche à suivre détaillée est dans
+l'écran *Réglages* de l'application. Connexion OAuth 2 PKCE : aucun secret n'est stocké.
+
+## Hors ligne (PWA)
+
+L'application est installable (« Ajouter à l'écran d'accueil ») et fonctionne sans réseau :
+le code et l'index sont préchargés, chaque jeu et les sprites sont mis en cache à la première
+consultation. Les icônes se régénèrent avec `python tools/icones.py` (Pillow).
+
 ## Organisation
 
 ```

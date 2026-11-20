@@ -311,7 +311,9 @@ def construire(jeu_id: str) -> None:
         ],
     }
     SORTIE.mkdir(parents=True, exist_ok=True)
-    (SORTIE / f"{jeu_id}.json").write_text(json.dumps(sortie, ensure_ascii=False, indent=1), encoding="utf-8")
+    # JSON compact : ces fichiers sont téléchargés par l'application
+    (SORTIE / f"{jeu_id}.json").write_text(json.dumps(sortie, ensure_ascii=False, separators=(",", ":")),
+                                           encoding="utf-8")
 
     index_path = SORTIE / "index.json"
     index = json.loads(index_path.read_text(encoding="utf-8")) if index_path.exists() else {"jeux": []}
