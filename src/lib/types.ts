@@ -29,9 +29,19 @@ export interface Pokemon {
 	nom: string;
 	nom_en: string;
 	types: string[];
+	/** Clé : identifiant de version, ou « * » si le sprite est commun à toutes les versions */
 	sprites: Record<string, string>;
+	sprites_chromatiques?: Record<string, string>;
 	artwork: string | null;
 	url_pokepedia: string | null;
+	/** Formes et Méga-évolutions suivies dans ce jeu */
+	formes?: Forme[];
+}
+
+export interface Forme {
+	id: string;
+	nom: string;
+	type: 'forme' | 'mega';
 }
 
 export interface Lieu {
@@ -55,19 +65,24 @@ export type Methode =
 	| 'evolution'
 	| 'echange_version'
 	| 'evenement'
-	| 'bug';
+	| 'bug'
+	| 'autre';
 
+/** Les champs vides sont omis dans les fichiers de données. */
 export interface Obtention {
 	id: number;
 	pokemon: number;
-	lieu: string | null;
+	/** Forme concernée (identifiant dans Pokemon.formes) */
+	forme?: string;
+	lieu?: string;
 	methode: Methode;
-	detail: string | null;
-	zone: string | null;
+	detail?: string;
+	zone?: string;
 	versions: string[];
-	niveaux: string | null;
-	taux: number | null;
-	taux_texte: string | null;
+	niveaux?: string;
+	taux?: number;
+	taux_texte?: string;
+	notes?: string;
 	depuis?: number;
 	glitch: boolean;
 }

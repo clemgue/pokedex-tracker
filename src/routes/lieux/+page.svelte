@@ -1,6 +1,6 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { analyserLieux } from '$lib/analyse';
-	import { normaliser } from '$lib/donnees';
+	import { normaliser, sprite } from '$lib/donnees';
 	import { etat } from '$lib/etat.svelte';
 
 	let partie = $derived(etat.partieActive);
@@ -27,13 +27,13 @@
 	<h1>Lieux</h1>
 	<p class="intro">
 		Dans l'ordre de progression de {donnees.jeu.nom} ({donnees.jeu.versions.find((v) => v.id === partie.version)?.nom}).
-		Le compteur indique les Pokémon encore à attraper sur place.
+		Le compteur indique les PokÃ©mon encore Ã  attraper sur place.
 	</p>
 
 	<div class="outils">
 		<label class="sr-only" for="r-lieu">Rechercher un lieu</label>
-		<input id="r-lieu" class="champ" type="search" placeholder="Rechercher un lieu…" bind:value={recherche} />
-		<label class="case"><input type="checkbox" bind:checked={masquerTermines} /> Masquer les lieux terminés</label>
+		<input id="r-lieu" class="champ" type="search" placeholder="Rechercher un lieuâ€¦" bind:value={recherche} />
+		<label class="case"><input type="checkbox" bind:checked={masquerTermines} /> Masquer les lieux terminÃ©s</label>
 	</div>
 
 	<ol class="liste">
@@ -43,11 +43,11 @@
 					<span class="nom">{l.lieu.nom}</span>
 					<span class="sprites" aria-hidden="true">
 						{#each l.pokemons.filter((p) => !etat.estAttrape(p.pokemon.id)).slice(0, 6) as p (p.pokemon.id)}
-							<img src={p.pokemon.sprites[partie.version] ?? p.pokemon.artwork} alt="" width="32" height="32" loading="lazy" />
+							<img src={sprite(p.pokemon, partie.version)} alt="" width="32" height="32" loading="lazy" />
 						{/each}
 					</span>
 					<span class="compteur">
-						{#if l.reste === 0}✓ Terminé{:else}reste <strong>{l.reste}</strong> / {l.total}{/if}
+						{#if l.reste === 0}âœ“ TerminÃ©{:else}reste <strong>{l.reste}</strong> / {l.total}{/if}
 					</span>
 				</a>
 			</li>

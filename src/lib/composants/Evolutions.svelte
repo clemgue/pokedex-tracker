@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { sprite } from '$lib/donnees';
 	import type { NoeudEvolution } from '$lib/analyse';
 	import Evolutions from './Evolutions.svelte';
 
@@ -17,7 +18,7 @@
 		class:attrape={attrape(noeud.pokemon.id)}
 		href="#/pokemon/{noeud.pokemon.id}"
 	>
-		<img src={noeud.pokemon.sprites[version] ?? noeud.pokemon.artwork} alt="" width="56" height="56" />
+		<img src={sprite(noeud.pokemon, version)} alt="" width="56" height="56" />
 		<span>{noeud.pokemon.nom}</span>
 	</a>
 	{#if noeud.suivants.length}

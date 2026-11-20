@@ -7,25 +7,17 @@
   "annee_sortie_fr": 1999,
   "ordre": 1,
   "versions": [
-    { "id": "rouge", "nom": "Rouge", "couleur": "#e3350d", "sprites_pokeapi": "red-blue" },
-    { "id": "bleu", "nom": "Bleu", "couleur": "#3b6fd8", "sprites_pokeapi": "red-blue" },
-    { "id": "jaune", "nom": "Jaune", "couleur": "#f5c518", "sprites_pokeapi": "yellow" }
+    { "id": "rouge", "nom": "Rouge", "couleur": "#e3350d", "codes": ["R"], "sprites_pokeapi": "red-blue" },
+    { "id": "bleu", "nom": "Bleu", "couleur": "#3b6fd8", "codes": ["B"], "sprites_pokeapi": "red-blue" },
+    { "id": "jaune", "nom": "Jaune", "couleur": "#f5c518", "codes": ["J"], "sprites_pokeapi": "yellow" }
   ],
   "generation_pokeapi": "generation-i",
   "pokedex": [
     { "id": "kanto", "nom": "Kanto", "pokeapi": "kanto" }
   ],
   "sources_pokepedia": [
-    {
-      "module": "Pokémon Rouge et Bleu",
-      "versions": ["rouge", "bleu"],
-      "codes": { "R": "rouge", "B": "bleu" }
-    },
-    {
-      "module": "Pokémon Jaune",
-      "versions": ["jaune"],
-      "codes": { "J": "jaune" }
-    }
+    { "module": "Pokémon Rouge et Bleu", "versions": ["rouge", "bleu"] },
+    { "module": "Pokémon Jaune", "versions": ["jaune"] }
   ],
   "ordre_lieux": [
     "Bourg Palette",

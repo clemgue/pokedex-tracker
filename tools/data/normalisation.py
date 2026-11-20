@@ -30,6 +30,7 @@ METHODES = {
     "echange_version": "Échange depuis une autre version",
     "evenement": "Événement",
     "bug": "Bug",
+    "autre": "Autre méthode",
 }
 
 _ZONES_INTERIEURES = {"Rez-de-chaussée", "Étage", "Sous-sol"}
@@ -103,7 +104,37 @@ def analyser_milieu(milieu: str) -> tuple[str, str | None, str | None]:
         return "fixe", "Réveiller avec la Pokéflûte", None
     if tete == "Bug":
         return "bug", f"Bug {precision}" if precision else None, None
-    raise ValueError(f"Milieu Poképédia non reconnu : {milieu!r}")
+    return classer_par_mots_cles(milieu)
+
+
+# Règles génériques (jeux récents) : premier motif trouvé dans le milieu, en minuscules.
+_REGLES = [
+    ("bug", ("bug",)),
+    ("fossile", ("fossile",)),
+    ("echange_pnj", ("échange",)),
+    ("don", ("donné", "dans une poké ball", "cadeau", "œuf")),
+    ("achat", ("acheter", "achat")),
+    ("peche", ("pêche",)),
+    ("surf", ("sur l'eau", "surf", "dans l'eau", "remous", "plongée", "algues", "sous l'eau")),
+    ("fixe", ("rencontre", "spécial", "fixe", "baron", "fausses balls", "faux objet", "flûte", "pokéflûte")),
+    ("hautes_herbes", ("herbe", "fleurs", "hordes", "troupeaux", "essaim", "poké radar", "navi-dex")),
+    ("marche", ("rez-de-chaussée", "étage", "sous-sol", "en marchant", "au sol", "sable", "poussière",
+                "sol accidenté", "toits", "marécage", "dans les airs", "arbre", "coup d'boule", "éclate-roc",
+                "ombre", "canal", "volants", "vols d'oiseaux", "embuscade", "tas de baies")),
+]
+
+
+def classer_par_mots_cles(milieu: str) -> tuple[str, str | None, str | None]:
+    """Classe un milieu quelconque ; « autre » (texte conservé) si rien ne correspond."""
+    texte = wiki_vers_texte(re.sub(r"\[\[Fichier:[^\]]*\]\]", "", milieu)).replace(",,", ",").strip(" ,")
+    texte = re.sub(r"\s*,\s*", ", ", texte)
+    if not texte:
+        return "marche", None, None  # jeux en monde ouvert : Pokémon visibles, sans milieu précisé
+    bas = texte.lower()
+    for methode, motifs in _REGLES:
+        if any(m in bas for m in motifs):
+            return methode, texte, None
+    return "autre", texte, None
 
 
 # --- Valeurs par version --------------------------------------------------------
@@ -139,11 +170,44 @@ def analyser_taux(texte: str) -> tuple[float | None, str | None]:
     return None, texte
 
 
+_LIBELLES_TAUX = {"taux-matin": "Matin", "taux-jour": "Jour", "taux-jou": "Jour", "taux-nuit": "Nuit",
+                  "taux-printemps": "Printemps", "taux-été": "Été", "taux-automne": "Automne",
+                  "taux-hiver": "Hiver", "taux-renfort": "Renfort"}
+_CHAMPS_NOTES = {"horaire": "Horaire", "météo": "Météo", "emplacement": "Emplacement",
+                 "précision-taux": "Précision", "renfort": "Renfort", "blocs": "Blocs", "attente": "Attente"}
+
+
+def _taux_composes(entree: dict, codes: dict[str, str], versions: list[str]) -> dict[str, str]:
+    """Taux par moment/saison (« taux-matin »…) → texte par version : « Matin 10 % · Nuit 5 % »."""
+    parts: dict[str, list[str]] = {v: [] for v in versions}
+    for cle, libelle in _LIBELLES_TAUX.items():
+        if cle not in entree:
+            continue
+        for v, val in valeurs_par_version(entree[cle], codes, versions).items():
+            if val and val not in ("-", "—", "0"):
+                pct, txt = analyser_taux(val)
+                parts[v].append(f"{libelle} {str(pct).removesuffix('.0').replace('.', ',')} %" if pct is not None
+                                else f"{libelle} {txt}")
+    return {v: " · ".join(p) for v, p in parts.items() if p}
+
+
+def notes_entree(entree: dict) -> str | None:
+    notes = [f"{lib} : {wiki_vers_texte(str(entree[c]))}" for c, lib in _CHAMPS_NOTES.items()
+             if entree.get(c) not in (None, "")]
+    return " ; ".join(notes) or None
+
+
 def normaliser_entree(entree: dict, codes: dict[str, str], versions: list[str]) -> list[dict]:
     """Une entrée Poképédia → une obtention par jeu de valeurs distinct (versions fusionnées)."""
-    methode, detail, zone = analyser_milieu(entree["milieu"])
-    taux = valeurs_par_version(entree.get("taux", ""), codes, versions)
+    methode, detail, zone = analyser_milieu(entree.get("milieu", ""))
+    if "taux" in entree:
+        taux = valeurs_par_version(entree["taux"], codes, versions)
+    else:
+        composes = _taux_composes(entree, codes, versions)
+        # Sans aucun taux (jeux en monde ouvert) : présent dans toutes les versions du module
+        taux = composes if composes else {v: "" for v in versions}
     niveaux = valeurs_par_version(entree.get("niveau", ""), codes, versions)
+    notes = notes_entree(entree)
 
     par_valeurs: dict[tuple, list[str]] = {}
     for v in versions:
@@ -154,23 +218,37 @@ def normaliser_entree(entree: dict, codes: dict[str, str], versions: list[str]) 
 
     resultat = []
     for (taux_brut, niveau), vs in par_valeurs.items():
-        taux_pct, taux_texte = analyser_taux(taux_brut)
+        if " · " in taux_brut:  # texte déjà composé (taux selon le moment)
+            nombres = [float(n.replace(",", ".")) for n in re.findall(r"(\d+(?:,\d+)?) %", taux_brut)]
+            taux_pct, taux_texte = (max(nombres) if nombres else None), taux_brut
+        elif taux_brut in ("", "-", "—", "?"):
+            taux_pct, taux_texte = None, None
+        else:
+            taux_pct, taux_texte = analyser_taux(taux_brut)
         if methode == "fossile":
             detail, taux_texte = f"Ressusciter le {taux_texte}", None
-        if niveau == "Identique":
+        if niveau in ("Identique", "-", "—", "?"):
             niveau = None
-        if taux_texte == "Unique" and methode in ("marche", "hautes_herbes", "surf"):
-            methode = "fixe"
+        m = methode
+        if taux_texte == "Unique" and m in ("marche", "hautes_herbes", "surf", "autre"):
+            m = "fixe"
         resultat.append({
-            "methode": methode,
+            "methode": m,
             "detail": detail,
             "zone": zone,
             "versions": vs,
             "niveaux": niveau or None,
             "taux": taux_pct,
             "taux_texte": taux_texte,
+            "notes": notes,
         })
     return resultat
+
+
+def analyser_nom(nom: str) -> tuple[str, str | None]:
+    """« Miaouss forme(Galar) » → (« Miaouss », « Galar ») ; « Pikachu » → (« Pikachu », None)."""
+    m = re.match(r"^(.*?)\s+forme\((.*)\)\s*$", nom)
+    return (m.group(1).strip(), m.group(2).strip()) if m else (nom.strip(), None)
 
 
 def analyser_lieu(cle: str) -> tuple[str, str, str | None]:
@@ -178,5 +256,5 @@ def analyser_lieu(cle: str) -> tuple[str, str, str | None]:
     page_aff, _, sous_zone = cle.partition("@")
     page, _, affiche = page_aff.partition("|")
     if not affiche:
-        affiche = re.sub(r" \((Kanto|Johto|Hoenn|Sinnoh|Unys|Kalos|Alola|Galar|Paldea)\)$", "", page)
+        affiche = re.sub(r" \((Kanto|Johto|Hoenn|Sinnoh|Unys|Kalos|Alola|Galar|Hisui|Paldea)\)$", "", page)
     return page, affiche, (sous_zone[:1].upper() + sous_zone[1:]) if sous_zone else None

@@ -6,7 +6,7 @@
 	import Evolutions from '$lib/composants/Evolutions.svelte';
 	import ListeObtentions from '$lib/composants/ListeObtentions.svelte';
 	import PuceMethode from '$lib/composants/PuceMethode.svelte';
-	import { numero } from '$lib/donnees';
+	import { numero, sprite } from '$lib/donnees';
 	import { etat } from '$lib/etat.svelte';
 
 	let id = $derived(Number(page.params.id));
@@ -55,9 +55,13 @@
 	<header class="entete">
 		<div class="visuel">
 			<img class="artwork" src={fiche.pokemon.artwork} alt="Illustration de {fiche.pokemon.nom}" width="160" height="160" />
-			{#if fiche.pokemon.sprites[partie.version]}
-				<img class="sprite" src={fiche.pokemon.sprites[partie.version]} alt="Sprite de {fiche.pokemon.nom}" width="64" height="64" />
-			{/if}
+			<img
+				class="sprite"
+				src={sprite(fiche.pokemon, partie.version, capture?.shiny ?? false)}
+				alt="Sprite de {fiche.pokemon.nom}"
+				width="64"
+				height="64"
+			/>
 		</div>
 		<div class="identite">
 			<span class="numero">{numero(fiche.numero)}</span>

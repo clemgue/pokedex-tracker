@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { sprite } from '$lib/donnees';
 	import { analyserVersion, INFOS_METHODES, type FichePokedex } from '$lib/analyse';
 	import PuceMethode from '$lib/composants/PuceMethode.svelte';
 	import { etat } from '$lib/etat.svelte';
@@ -101,7 +102,7 @@
 				{#each aEchanger as f (f.pokemon.id)}
 					<li>
 						<a href="#/pokemon/{f.pokemon.id}">
-							<img src={f.pokemon.sprites[partie.version] ?? f.pokemon.artwork} alt="" width="40" height="40" />
+							<img src={sprite(f.pokemon, partie.version)} alt="" width="40" height="40" />
 							<span>{f.pokemon.nom}</span>
 						</a>
 						<small>{f.obtentions.find((o) => o.methode === 'echange_version')?.detail}</small>

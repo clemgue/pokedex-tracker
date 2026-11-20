@@ -5,7 +5,7 @@
 	import PuceMethode from '$lib/composants/PuceMethode.svelte';
 	import BoutonCapture from '$lib/composants/BoutonCapture.svelte';
 	import NouvellePartie from '$lib/composants/NouvellePartie.svelte';
-	import { normaliser, numero } from '$lib/donnees';
+	import { normaliser, numero , sprite } from '$lib/donnees';
 	import { etat } from '$lib/etat.svelte';
 	import { filtres as F, reinitialiserFiltres, type Statut } from '$lib/filtres.svelte';
 
@@ -191,7 +191,7 @@
 					<span class="numero">{numero(f.numero)}</span>
 					<img
 						class="sprite"
-						src={f.pokemon.sprites[partie.version] ?? f.pokemon.artwork}
+						src={sprite(f.pokemon, partie.version)}
 						alt=""
 						width="56"
 						height="56"

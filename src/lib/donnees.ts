@@ -1,5 +1,5 @@
 import { base } from '$app/paths';
-import type { DonneesJeu, InfoJeu } from './types';
+import type { DonneesJeu, InfoJeu, Pokemon } from './types';
 
 const cache = new Map<string, Promise<DonneesJeu>>();
 
@@ -21,6 +21,12 @@ export function chargerJeu(id: string): Promise<DonneesJeu> {
 		cache.set(id, p);
 	}
 	return p;
+}
+
+/** Sprite d'un Pokémon pour une version (« * » = commun à toutes), chromatique si demandé. */
+export function sprite(p: Pokemon, version: string, chromatique = false): string {
+	const s = chromatique ? p.sprites_chromatiques : p.sprites;
+	return s?.[version] ?? s?.['*'] ?? p.sprites[version] ?? p.sprites['*'] ?? p.artwork ?? '';
 }
 
 /** Nom d'un type → suffixe de variable CSS (« Électrik » → « electrik »). */

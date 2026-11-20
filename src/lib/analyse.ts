@@ -17,6 +17,7 @@ export const INFOS_METHODES: Record<Methode, { court: string; famille: Famille }
 	echange_pnj: { court: 'Échange PNJ', famille: 'cadeau' },
 	achat: { court: 'Achat', famille: 'cadeau' },
 	fossile: { court: 'Fossile', famille: 'cadeau' },
+	autre: { court: 'Autre', famille: 'sauvage' },
 	evolution: { court: 'Évolution', famille: 'evolution' },
 	evenement: { court: 'Événement', famille: 'echange' },
 	echange_version: { court: 'Autre version', famille: 'echange' },
@@ -127,9 +128,11 @@ export function decrire(o: Obtention, donnees: DonneesJeu, avecMethode = true): 
 	}
 	if (o.zone) parties.push(o.zone);
 	if (o.niveaux) parties.push(`niv. ${o.niveaux}`);
-	if (o.taux !== null) parties.push(`${String(o.taux).replace('.', ',')} %`);
+	if (o.taux_texte?.includes(' · ')) parties.push(o.taux_texte); // taux selon le moment / la saison
+	else if (o.taux != null) parties.push(`${String(o.taux).replace('.', ',')} %`);
 	else if (o.taux_texte && o.taux_texte !== 'Unique') parties.push(o.taux_texte);
 	if (o.taux_texte === 'Unique') parties.push('unique');
+	if (o.notes) parties.push(o.notes);
 	return parties.join(' · ');
 }
 

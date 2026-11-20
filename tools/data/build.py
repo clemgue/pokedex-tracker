@@ -1,12 +1,12 @@
 """Génère les données d'un jeu pour Pokédex Tracker.
 
-Usage :  python build.py rouge-bleu-jaune
+Usage :  python build.py <jeu>      ex. python build.py rouge-bleu-jaune
+         python build.py tous       tous les jeux de tools/data/jeux/
 
 Sources :
-- PokéAPI : liste du Pokédex régional, noms FR/EN, types (de la génération du jeu),
-  sprites de la version, chaînes d'évolution.
-- Poképédia : localisations (Module:Localisations/Données/<jeu>), URL des pages
-  Pokémon et lieux.
+- PokéAPI : Pokédex régionaux/national, noms FR/EN, types (de la génération du jeu),
+  sprites de la version (normaux et chromatiques), chaînes d'évolution, Méga-évolutions.
+- Poképédia : localisations (Module:Localisations/Données/<jeu>), URL des pages Pokémon et lieux.
 - tools/data/jeux/<jeu>.json : configuration, ordre des lieux, corrections manuelles.
 
 Sortie : static/data/jeux/<jeu>.json + static/data/jeux/index.json
@@ -28,6 +28,11 @@ RACINE = Path(__file__).resolve().parents[2]
 CONFIGS = Path(__file__).parent / "jeux"
 SORTIE = RACINE / "static" / "data" / "jeux"
 
+# Dernier numéro national de chaque génération
+MAX_ID = {1: 151, 2: 251, 3: 386, 4: 493, 5: 649, 6: 721, 7: 809, 8: 905, 9: 1025}
+METHODES_DIRECTES = {"hautes_herbes", "marche", "surf", "peche", "fixe", "don", "echange_pnj", "achat",
+                     "fossile", "autre"}
+
 avertissements: list[str] = []
 
 
@@ -36,8 +41,8 @@ def avertir(msg: str) -> None:
 
 
 def slug(texte: str) -> str:
-    t = unicodedata.normalize("NFKD", texte).encode("ascii", "ignore").decode()
-    t = t.replace("♀", "f").replace("♂", "m")
+    t = texte.replace("♀", "f").replace("♂", "m")
+    t = unicodedata.normalize("NFKD", t).encode("ascii", "ignore").decode()
     return re.sub(r"[^a-z0-9]+", "-", t.lower()).strip("-")
 
 
@@ -54,15 +59,27 @@ def num_generation(nom: str) -> int:
     return romains[nom.removeprefix("generation-")]
 
 
-# --- PokéAPI -------------------------------------------------------------------
+def tri_naturel(texte: str) -> list:
+    return [int(t) if t.isdigit() else t.lower() for t in re.split(r"(\d+)", texte)]
 
-_cache_types: dict[str, str] = {}
+
+def ecrire_json(chemin: Path, donnees: object, compact: bool) -> None:
+    texte = json.dumps(donnees, ensure_ascii=False, separators=(",", ":")) if compact \
+        else json.dumps(donnees, ensure_ascii=False, indent=1)
+    chemin.write_text(texte + "\n", encoding="utf-8", newline="\n")
 
 
-def type_fr(nom_en: str) -> str:
-    if nom_en not in _cache_types:
-        _cache_types[nom_en] = sources.localized(sources.pokeapi(f"type/{nom_en}")["names"], "fr") or nom_en
-    return _cache_types[nom_en]
+# --- PokéAPI : noms, types, sprites ------------------------------------------------
+
+_cache_noms: dict[str, str] = {}
+
+
+def nom_fr(url: str) -> str:
+    """Nom français d'une ressource PokéAPI (type, objet, capacité, lieu…)."""
+    if url not in _cache_noms:
+        res = sources.pokeapi(url)
+        _cache_noms[url] = sources.localized(res.get("names", []), "fr") or res["name"]
+    return _cache_noms[url]
 
 
 def types_pour_generation(pokemon: dict, generation: int) -> list[str]:
@@ -73,84 +90,148 @@ def types_pour_generation(pokemon: dict, generation: int) -> list[str]:
         if num_generation(p["generation"]["name"]) >= generation
     ]
     types = min(candidats, key=lambda c: c[0])[1] if candidats else pokemon["types"]
-    return [type_fr(t["type"]["name"]) for t in sorted(types, key=lambda t: t["slot"])]
+    return [nom_fr(t["type"]["url"]) for t in sorted(types, key=lambda t: t["slot"])]
 
 
-def charger_pokemon(config: dict) -> tuple[dict[int, dict], list[dict]]:
-    """Renvoie ({id_national: pokémon}, [pokédex])."""
-    generation = config["generation"]
-    especes: dict[int, dict] = {}
-    pokedexes = []
-    for pdx in config["pokedex"]:
-        donnees = sources.pokeapi(f"pokedex/{pdx['pokeapi']}")
-        entrees = []
-        for e in sorted(donnees["pokemon_entries"], key=lambda e: e["entry_number"]):
-            pid = id_depuis_url(e["pokemon_species"]["url"])
-            entrees.append({"numero": e["entry_number"], "pokemon": pid})
-            especes[pid] = {}
-        pokedexes.append({"id": pdx["id"], "nom": pdx["nom"], "entrees": entrees})
-
-    print(f"PokéAPI : {len(especes)} espèces…", flush=True)
-    for pid in sorted(especes):
+def noms_especes(generation: int) -> dict[str, int]:
+    """Nom français → numéro national, pour toutes les espèces jusqu'à la génération du jeu."""
+    resultat = {}
+    for pid in range(1, MAX_ID[generation] + 1):
         espece = sources.pokeapi(f"pokemon-species/{pid}")
-        poke = sources.pokeapi(f"pokemon/{pid}")
-        sprites_gen = poke["sprites"]["versions"].get(config["generation_pokeapi"], {})
-        sprites = {}
-        for v in config["versions"]:
-            jeu = sprites_gen.get(v["sprites_pokeapi"], {})
-            url = jeu.get("front_transparent") or jeu.get("front_default")
-            if url:
-                sprites[v["id"]] = url
-            else:
-                avertir(f"Sprite {v['id']} manquant pour #{pid}")
-        especes[pid] = {
-            "id": pid,
-            "nom": sources.localized(espece["names"], "fr"),
-            "nom_en": sources.localized(espece["names"], "en"),
-            "types": types_pour_generation(poke, generation),
-            "sprites": sprites,
-            "artwork": poke["sprites"]["other"]["official-artwork"]["front_default"],
-            "_chaine": espece["evolution_chain"]["url"],
-        }
-    return especes, pokedexes
+        for lang in ("fr", "en"):
+            nom = sources.localized(espece["names"], lang)
+            if nom:
+                resultat.setdefault(nom, pid)
+    return resultat
 
+
+def sprites_pokemon(poke: dict, config: dict) -> tuple[dict, dict]:
+    """Sprites normaux et chromatiques par version (repli : sprite par défaut)."""
+    gen = poke["sprites"]["versions"].get(config.get("generation_pokeapi", ""), {}) or {}
+    normaux, chromas = {}, {}
+    for v in config["versions"]:
+        jeu = gen.get(v.get("sprites_pokeapi") or "", {}) or {}
+        normal = jeu.get("front_transparent") or jeu.get("front_default") or poke["sprites"]["front_default"]
+        chroma = jeu.get("front_shiny_transparent") or jeu.get("front_shiny") or poke["sprites"]["front_shiny"]
+        if normal:
+            normaux[v["id"]] = normal
+        if chroma and config["generation"] >= 2:
+            chromas[v["id"]] = chroma
+    # Évite de répéter la même URL pour chaque version
+    if len(set(normaux.values())) == 1:
+        normaux = {"*": next(iter(normaux.values()))}
+    if len(set(chromas.values())) == 1:
+        chromas = {"*": next(iter(chromas.values()))}
+    return normaux, chromas
+
+
+def megas(espece: dict) -> list[dict]:
+    """Méga-évolutions d'une espèce (variétés PokéAPI « -mega… »)."""
+    resultat = []
+    for var in espece["varieties"]:
+        nom = var["pokemon"]["name"]
+        if "-mega" not in nom:
+            continue
+        poke = sources.pokeapi(var["pokemon"]["url"])
+        forme = sources.pokeapi(poke["forms"][0]["url"])
+        libelle = sources.localized(forme.get("names", []), "fr") or sources.localized(forme.get("form_names", []), "fr")
+        suffixe = nom.split("-mega", 1)[1].strip("-")
+        resultat.append({"id": "mega" + (f"-{suffixe}" if suffixe else ""), "nom": libelle or f"Méga ({nom})",
+                         "type": "mega"})
+    return resultat
+
+
+# --- PokéAPI : évolutions ------------------------------------------------------------
 
 def objet_existe(objet: dict, generation: int) -> bool:
-    """Un objet existe dans la génération s'il y a un index de jeu dans cette génération ou avant."""
     gens = [num_generation(g["generation"]["name"]) for g in objet.get("game_indices", [])]
     return not gens or min(gens) <= generation
 
 
-def condition_evolution(details: list[dict], pre_nom: str, generation: int) -> str:
+_DECLENCHEURS = {
+    "shed": "(apparaît avec une Poké Ball libre et une place dans l'équipe)",
+    "spin": "en faisant tourner le personnage",
+    "tower-of-darkness": "en réussissant la Tour des Ténèbres",
+    "tower-of-waters": "en réussissant la Tour des Eaux",
+    "three-critical-hits": "après trois coups critiques en un combat",
+    "take-damage": "après avoir perdu au moins 49 PV",
+    "agile-style-move": "en utilisant une capacité en style Rapide",
+    "strong-style-move": "en utilisant une capacité en style Puissant",
+    "recoil-damage": "après avoir subi des dégâts de contrecoup",
+    "use-move": "en utilisant une capacité",
+    "gimmighoul-coins": "en réunissant 999 pièces",
+}
+
+
+def condition_evolution(details: list[dict], pre_nom: str, generation: int, especes_noms: dict[int, str]) -> str:
     textes = []
     for d in details:
         if d.get("required_pokemon_form"):
-            continue  # évolution propre à une forme régionale (gérée avec les formes, lot V1.x)
+            continue  # évolution d'une forme régionale : non gérée par espèce
         if d.get("version_group"):
             gen_vg = num_generation(sources.pokeapi(d["version_group"]["url"])["generation"]["name"])
             if gen_vg > generation:
                 continue  # condition introduite dans un jeu plus récent
         declencheur = d["trigger"]["name"]
-        if declencheur == "level-up" and d.get("min_level"):
-            textes.append(f"Faire évoluer {pre_nom} au niveau {d['min_level']}")
-        elif declencheur == "use-item" and d.get("item"):
+        parts: list[str] = []
+        if declencheur == "use-item" and d.get("item"):
             objet = sources.pokeapi(d["item"]["url"])
             if not objet_existe(objet, generation):
-                continue  # ex. Fil de Liaison (Gén. 8) pour les jeux plus anciens
-            nom = sources.localized(objet["names"], "fr")
-            article = "une " if nom.startswith("Pierre") else ""
-            textes.append(f"Faire évoluer {pre_nom} avec {article}{nom}")
+                continue
+            nom = nom_fr(d["item"]["url"])
+            parts.append(f"avec {'une ' if nom.startswith('Pierre') else ''}{nom}")
         elif declencheur == "trade":
-            textes.append(f"Faire évoluer {pre_nom} par échange")
-        else:
-            textes.append(f"Faire évoluer {pre_nom}")
-    return " ou ".join(dict.fromkeys(textes)) or f"Faire évoluer {pre_nom}"
+            parts.append("par échange")
+            if d.get("trade_species"):
+                parts.append(f"contre {especes_noms.get(id_depuis_url(d['trade_species']['url']), 'un Pokémon précis')}")
+        elif declencheur in _DECLENCHEURS:
+            parts.append(_DECLENCHEURS[declencheur])
+        if d.get("min_level"):
+            parts.append(f"au niveau {d['min_level']}")
+        elif declencheur == "level-up" and len(d) > 0:
+            parts.append("en montant d'un niveau")
+        if d.get("held_item"):
+            parts.append(f"en tenant {nom_fr(d['held_item']['url'])}")
+        if d.get("min_happiness"):
+            parts.append("avec un bonheur élevé")
+        if d.get("min_affection"):
+            parts.append("avec une forte affection")
+        if d.get("min_beauty"):
+            parts.append("avec une Beauté élevée")
+        if d.get("known_move"):
+            parts.append(f"en connaissant {nom_fr(d['known_move']['url'])}")
+        if d.get("known_move_type"):
+            parts.append(f"en connaissant une capacité de type {nom_fr(d['known_move_type']['url'])}")
+        if d.get("location"):
+            parts.append(f"à {nom_fr(d['location']['url'])}")
+        moment = {"day": "le jour", "night": "la nuit", "dusk": "au crépuscule"}.get(d.get("time_of_day") or "")
+        if moment:
+            parts.append(moment)
+        if d.get("needs_overworld_rain"):
+            parts.append("sous la pluie")
+        if d.get("party_species"):
+            parts.append(f"avec {especes_noms.get(id_depuis_url(d['party_species']['url']), 'un Pokémon précis')}"
+                         " dans l'équipe")
+        if d.get("party_type"):
+            parts.append(f"avec un Pokémon de type {nom_fr(d['party_type']['url'])} dans l'équipe")
+        stats = d.get("relative_physical_stats")
+        if stats is not None:
+            parts.append({1: "si Attaque > Défense", -1: "si Attaque < Défense", 0: "si Attaque = Défense"}[stats])
+        if d.get("gender"):
+            parts.append("(femelle)" if d["gender"] == 1 else "(mâle)")
+        if d.get("turn_upside_down"):
+            parts.append("en retournant la console")
+        if declencheur == "other" and not parts:
+            parts.append("(condition spéciale)")
+        textes.append(f"Faire évoluer {pre_nom} " + " ".join(parts) if parts else f"Faire évoluer {pre_nom}")
+    return " ou ".join(dict.fromkeys(t.strip() for t in textes)) or f"Faire évoluer {pre_nom}"
 
 
 def charger_evolutions(especes: dict[int, dict], generation: int) -> list[tuple[int, int, str]]:
     """[(pré-évolution, évolution, condition)] limité aux espèces du jeu."""
     liens = []
     vues = set()
+    noms = {pid: p["nom"] for pid, p in especes.items()}
     for p in especes.values():
         url = p["_chaine"]
         if url in vues:
@@ -162,58 +243,79 @@ def charger_evolutions(especes: dict[int, dict], generation: int) -> list[tuple[
             for suivant in noeud["evolves_to"]:
                 post = id_depuis_url(suivant["species"]["url"])
                 if pre in especes and post in especes:
-                    liens.append((pre, post, condition_evolution(suivant["evolution_details"],
-                                                                 especes[pre]["nom"], generation)))
+                    liens.append((pre, post, condition_evolution(suivant["evolution_details"], noms[pre],
+                                                                 generation, noms)))
                 parcourir(suivant)
 
         parcourir(sources.pokeapi(url)["chain"])
     return liens
 
 
-# --- Poképédia -----------------------------------------------------------------
+# --- Poképédia ---------------------------------------------------------------------
 
-def charger_localisations(config: dict, par_nom: dict[str, int]) -> tuple[list[dict], dict[str, dict]]:
+def codes_module(config: dict, src: dict) -> dict[str, str]:
+    codes = {}
+    for v in config["versions"]:
+        if v["id"] in src["versions"]:
+            for c in v.get("codes", []):
+                codes[c] = v["id"]
+    return codes
+
+
+def charger_localisations(config: dict, par_nom: dict[str, int]):
     obtentions: list[dict] = []
     lieux: dict[str, dict] = {}
+    formes: dict[int, dict[str, str]] = {}
+    inconnus: dict[str, int] = {}
     exclusions = {(e["lieu"], e["pokemon"]) for e in config["corrections"].get("exclure", [])}
 
     for src in config["sources_pokepedia"]:
         titre = f"Module:Localisations/Données/{src['module']}"
         donnees = lua_table.parse_module(sources.pokepedia_source(titre))
+        codes = codes_module(config, src)
         print(f"Poképédia : {src['module']} — {len(donnees)} lieux", flush=True)
         for cle_lieu, pokemons in donnees.items():
             page, affiche, sous_zone = norm.analyser_lieu(cle_lieu)
             lieu = lieux.setdefault(page, {"id": slug(page), "nom": affiche, "page": page})
-            for nom, entrees in pokemons.items():
-                if (page, nom) in exclusions:
+            for nom_brut, entrees in pokemons.items():
+                nom, forme = norm.analyser_nom(nom_brut)
+                if (page, nom) in exclusions or (page, nom_brut) in exclusions:
                     continue
                 pid = par_nom.get(nom)
                 if pid is None:
-                    avertir(f"Pokémon Poképédia inconnu : {nom!r} ({page})")
+                    inconnus[nom] = inconnus.get(nom, 0) + 1
                     continue
+                forme_id = None
+                if forme:
+                    forme_id = slug(forme)
+                    formes.setdefault(pid, {})[forme_id] = forme
                 for entree in entrees:
-                    for o in norm.normaliser_entree(entree, src["codes"], src["versions"]):
+                    for o in norm.normaliser_entree(entree, codes, src["versions"]):
                         zone = " — ".join(z for z in (sous_zone, majuscule(o["zone"])) if z) or None
-                        obtentions.append({"pokemon": pid, "lieu": lieu["id"], **o, "zone": zone,
-                                           "detail": majuscule(o["detail"])})
-    return obtentions, lieux
+                        obtentions.append({"pokemon": pid, "forme": forme_id, "lieu": lieu["id"], **o,
+                                           "zone": zone, "detail": majuscule(o["detail"])})
+    for nom, n in sorted(inconnus.items()):
+        avertir(f"Pokémon Poképédia inconnu : {nom!r} ({n} entrée(s))")
+    return obtentions, lieux, formes
 
 
-# --- Assemblage ------------------------------------------------------------------
+# --- Assemblage ------------------------------------------------------------------------
 
-def ajouter_evolutions_et_echanges(config: dict, especes: dict[int, dict], obtentions: list[dict],
-                                   evolutions: list[tuple[int, int, str]]) -> list[dict]:
+def obtention(**champs) -> dict:
+    base = {"pokemon": None, "forme": None, "lieu": None, "methode": None, "detail": None, "zone": None,
+            "versions": [], "niveaux": None, "taux": None, "taux_texte": None, "notes": None}
+    return base | champs
+
+
+def ajouter_evolutions_et_echanges(config, especes, obtentions, evolutions) -> list[dict]:
     versions = [v["id"] for v in config["versions"]]
-    directes = {v: {o["pokemon"] for o in obtentions if v in o["versions"] and o["methode"] != "bug"}
+    directes = {v: {o["pokemon"] for o in obtentions if v in o["versions"] and o["methode"] in METHODES_DIRECTES}
                 for v in versions}
-
-    # Évolutions : disponibles dans une version si la pré-évolution y est obtenable (point fixe)
-    # Évolutions impossibles dans certaines versions (ex. Pikachu de Jaune et la Pierre Foudre)
-    interdites = {(e["de"], e["vers"], v)
-                  for e in config["corrections"].get("evolutions_impossibles", []) for v in e["versions"]}
     noms = {p["nom"]: pid for pid, p in especes.items()}
-    interdites = {(noms[a], noms[b], v) for a, b, v in interdites}
+    interdites = {(noms[e["de"]], noms[e["vers"]], v)
+                  for e in config["corrections"].get("evolutions_impossibles", []) for v in e["versions"]}
 
+    # Point fixe : une évolution est obtenable si sa pré-évolution l'est
     obtenables = {v: set(directes[v]) for v in versions}
     change = True
     while change:
@@ -228,37 +330,81 @@ def ajouter_evolutions_et_echanges(config: dict, especes: dict[int, dict], obten
     for pre, post, condition in evolutions:
         vs = [v for v in versions if pre in obtenables[v] and (pre, post, v) not in interdites]
         if vs:
-            ajouts.append({"pokemon": post, "lieu": None, "methode": "evolution", "detail": condition,
-                           "depuis": pre, "zone": None, "versions": vs, "niveaux": None,
-                           "taux": None, "taux_texte": None})
+            ajouts.append(obtention(pokemon=post, methode="evolution", detail=condition, depuis=pre, versions=vs))
 
-    # Échange depuis une autre version : pour les versions où l'espèce est inobtenable
     for pid in especes:
         manquantes = [v for v in versions if pid not in obtenables[v]]
         autres = [v for v in versions if pid in obtenables[v]]
         if manquantes and autres:
             noms_v = [next(x["nom"] for x in config["versions"] if x["id"] == a) for a in autres]
-            noms = ", ".join(noms_v[:-1]) + " ou " + noms_v[-1] if len(noms_v) > 1 else noms_v[0]
-            ajouts.append({"pokemon": pid, "lieu": None, "methode": "echange_version",
-                           "detail": f"Échanger depuis {noms}", "zone": None, "versions": manquantes,
-                           "niveaux": None, "taux": None, "taux_texte": None})
+            liste = ", ".join(noms_v[:-1]) + " ou " + noms_v[-1] if len(noms_v) > 1 else noms_v[0]
+            ajouts.append(obtention(pokemon=pid, methode="echange_version", detail=f"Échanger depuis {liste}",
+                                    versions=manquantes))
     return ajouts
 
 
-def construire(jeu_id: str) -> None:
-    config = json.loads((CONFIGS / f"{jeu_id}.json").read_text(encoding="utf-8"))
-    versions = [v["id"] for v in config["versions"]]
+def charger_pokedex(config: dict, par_nom_global: dict[str, int]) -> list[dict]:
+    pokedexes = []
+    for pdx in config["pokedex"]:
+        if not pdx.get("pokeapi"):
+            pokedexes.append({"id": pdx["id"], "nom": pdx["nom"], "entrees": None})  # rempli plus tard
+            continue
+        donnees = sources.pokeapi(f"pokedex/{pdx['pokeapi']}")
+        entrees = []
+        for e in sorted(donnees["pokemon_entries"], key=lambda e: e["entry_number"]):
+            pid = id_depuis_url(e["pokemon_species"]["url"])
+            if pid <= pdx.get("max", MAX_ID[config["generation"]]):
+                entrees.append({"numero": e["entry_number"], "pokemon": pid})
+        pokedexes.append({"id": pdx["id"], "nom": pdx["nom"], "entrees": entrees})
+    return pokedexes
 
-    especes, pokedexes = charger_pokemon(config)
-    par_nom = {p["nom"]: pid for pid, p in especes.items()}
-    evolutions = charger_evolutions(especes, config["generation"])
-    obtentions, lieux = charger_localisations(config, par_nom)
+
+def construire(jeu_id: str) -> None:
+    avertissements.clear()
+    config = json.loads((CONFIGS / f"{jeu_id}.json").read_text(encoding="utf-8"))
+    config.setdefault("corrections", {})
+    generation = config["generation"]
+    versions = [v["id"] for v in config["versions"]]
+    print(f"\n##### {config['nom']} #####", flush=True)
+
+    print("PokéAPI : noms des espèces…", flush=True)
+    par_nom = noms_especes(generation)
+    pokedexes = charger_pokedex(config, par_nom)
+    obtentions, lieux, formes = charger_localisations(config, par_nom)
 
     for a in config["corrections"].get("ajouter", []):
-        obtentions.append({"pokemon": par_nom[a["pokemon"]], "lieu": a.get("lieu"), "methode": a["methode"],
-                           "detail": a.get("detail"), "zone": a.get("zone"), "versions": a["versions"],
-                           "niveaux": a.get("niveaux"), "taux": a.get("taux"), "taux_texte": a.get("taux_texte")})
+        champs = {k: v for k, v in a.items() if k != "pokemon"}
+        obtentions.append(obtention(pokemon=par_nom[a["pokemon"]], **champs))
 
+    # Espèces du jeu : Pokédex + Pokémon présents dans les localisations
+    ids = {e["pokemon"] for p in pokedexes if p["entrees"] for e in p["entrees"]}
+    ids |= {o["pokemon"] for o in obtentions}
+    for p in pokedexes:
+        if p["entrees"] is None:  # Pokédex reconstruit depuis les données (absent de PokéAPI)
+            p["entrees"] = [{"numero": pid, "pokemon": pid} for pid in sorted(ids)]
+
+    print(f"PokéAPI : {len(ids)} espèces…", flush=True)
+    especes: dict[int, dict] = {}
+    for pid in sorted(ids):
+        espece = sources.pokeapi(f"pokemon-species/{pid}")
+        poke = sources.pokeapi(f"pokemon/{pid}")
+        normaux, chromas = sprites_pokemon(poke, config)
+        liste_formes = [{"id": fid, "nom": nom, "type": "forme"} for fid, nom in sorted(formes.get(pid, {}).items())]
+        if config.get("megas"):
+            liste_formes += megas(espece)
+        especes[pid] = {
+            "id": pid,
+            "nom": sources.localized(espece["names"], "fr"),
+            "nom_en": sources.localized(espece["names"], "en"),
+            "types": types_pour_generation(poke, generation),
+            "sprites": normaux,
+            **({"sprites_chromatiques": chromas} if chromas else {}),
+            "artwork": poke["sprites"]["other"]["official-artwork"]["front_default"],
+            **({"formes": liste_formes} if liste_formes else {}),
+            "_chaine": espece["evolution_chain"]["url"],
+        }
+
+    evolutions = charger_evolutions(especes, generation)
     obtentions += ajouter_evolutions_et_echanges(config, especes, obtentions, evolutions)
 
     # Liens Poképédia (titres vérifiés, redirections suivies)
@@ -270,40 +416,46 @@ def construire(jeu_id: str) -> None:
         p["url_pokepedia"] = sources.pokepedia_url(titre) if titre else None
         if not titre:
             avertir(f"Page Poképédia introuvable pour le Pokémon {p['nom']}")
-    ordre = {page: i for i, page in enumerate(config["ordre_lieux"], start=1)}
+
+    ordre_manuel = {page: i for i, page in enumerate(config.get("ordre_lieux", []), start=1)}
+    restants = sorted((l for l in lieux.values() if l["page"] not in ordre_manuel), key=lambda l: tri_naturel(l["nom"]))
+    for i, l in enumerate(restants, start=len(ordre_manuel) + 1):
+        if ordre_manuel:
+            avertir(f"Lieu absent de ordre_lieux : {l['page']}")
+        ordre_manuel[l["page"]] = i
+    for page in config.get("ordre_lieux", []):
+        if page not in lieux:
+            avertir(f"ordre_lieux cite un lieu sans données : {page}")
     for l in lieux.values():
         titre = resolus.get(l["page"])
         l["url_pokepedia"] = sources.pokepedia_url(titre) if titre else None
         if not titre:
             avertir(f"Page Poképédia introuvable pour le lieu {l['page']}")
-        l["ordre"] = ordre.get(l["page"])
-        if l["ordre"] is None:
-            avertir(f"Lieu absent de ordre_lieux : {l['page']}")
-        l["versions"] = [v for v in versions
-                         if any(o["lieu"] == l["id"] and v in o["versions"] for o in obtentions)]
-    for page in ordre:
-        if page not in lieux:
-            avertir(f"ordre_lieux cite un lieu sans données : {page}")
+        l["ordre"] = ordre_manuel[l["page"]]
+        l["versions"] = [v for v in versions if any(o["lieu"] == l["id"] and v in o["versions"] for o in obtentions)]
 
     # Sortie
-    ordre_par_id = {l["id"]: l["ordre"] or 999 for l in lieux.values()}
-    obtentions.sort(key=lambda o: (o["pokemon"], o["lieu"] is None, ordre_par_id.get(o["lieu"], 999), o["methode"]))
+    ordre_par_id = {l["id"]: l["ordre"] for l in lieux.values()}
+    obtentions.sort(key=lambda o: (o["pokemon"], o["lieu"] is None, ordre_par_id.get(o["lieu"], 9999), o["methode"]))
+    sortie_obtentions = []
     for i, o in enumerate(obtentions, start=1):
-        o["id"] = i
         o["glitch"] = o["methode"] == "bug"
+        # Champs vides omis (fichier plus léger)
+        sortie_obtentions.append({"id": i} | {k: v for k, v in o.items() if v is not None and k != "id"})
     for p in especes.values():
         del p["_chaine"]
 
+    jeu = {k: config[k] for k in ("id", "nom", "generation", "region", "annee_sortie", "annee_sortie_fr", "ordre")}
+    jeu["versions"] = [{k: v[k] for k in ("id", "nom", "couleur")} for v in config["versions"]]
     sortie = {
         "format": 1,
-        "jeu": {k: config[k] for k in ("id", "nom", "generation", "region", "annee_sortie", "annee_sortie_fr", "ordre")}
-               | {"versions": [{k: v[k] for k in ("id", "nom", "couleur")} for v in config["versions"]]},
+        "jeu": jeu,
         "methodes": norm.METHODES,
         "pokedex": pokedexes,
         "pokemon": [especes[pid] for pid in sorted(especes)],
         "lieux": sorted(({k: l[k] for k in ("id", "nom", "url_pokepedia", "versions", "ordre")} for l in lieux.values()),
-                        key=lambda l: (l["ordre"] or 999, l["nom"])),
-        "obtentions": [{"id": o["id"], **{k: v for k, v in o.items() if k != "id"}} for o in obtentions],
+                        key=lambda l: l["ordre"]),
+        "obtentions": sortie_obtentions,
         "sources": [
             {"nom": "Poképédia", "url": "https://www.pokepedia.fr/",
              "licence": "Contenu sous licence Creative Commons BY-NC-SA"},
@@ -311,32 +463,35 @@ def construire(jeu_id: str) -> None:
         ],
     }
     SORTIE.mkdir(parents=True, exist_ok=True)
-    # JSON compact : ces fichiers sont téléchargés par l'application
-    (SORTIE / f"{jeu_id}.json").write_text(json.dumps(sortie, ensure_ascii=False, separators=(",", ":")),
-                                           encoding="utf-8")
+    ecrire_json(SORTIE / f"{jeu_id}.json", sortie, compact=True)
 
     index_path = SORTIE / "index.json"
     index = json.loads(index_path.read_text(encoding="utf-8")) if index_path.exists() else {"jeux": []}
-    index["jeux"] = [j for j in index["jeux"] if j["id"] != jeu_id] + [
-        {**sortie["jeu"], "fichier": f"{jeu_id}.json"}]
+    index["jeux"] = [j for j in index["jeux"] if j["id"] != jeu_id] + [{**jeu, "fichier": f"{jeu_id}.json"}]
     index["jeux"].sort(key=lambda j: j["ordre"])
-    index_path.write_text(json.dumps(index, ensure_ascii=False, indent=1), encoding="utf-8")
+    ecrire_json(index_path, index, compact=False)
 
-    # Contrôle croisé avec les listes « Indisponibles » de Poképédia
+    controler_indisponibles(config, especes, obtentions, par_nom)
+    rapport(config, especes, lieux, obtentions)
+
+
+def controler_indisponibles(config, especes, obtentions, par_nom) -> None:
+    """Contrôle croisé avec les listes « Indisponibles » de Poképédia."""
     for src in config["sources_pokepedia"]:
         try:
             indispo = lua_table.parse_module(
                 sources.pokepedia_source(f"Module:Localisations/Données/{src['module']}/Indisponibles"))
         except KeyError:
             continue
-        # La liste Indisponibles d'un module couvre les Pokémon absents de TOUTES ses versions
-        # (les exclusivités d'une version n'y figurent pas).
+        if not isinstance(indispo, dict):
+            continue
         connus = {e["pokemon"] for e in config["corrections"].get("ecarts_pokepedia_connus", [])
                   if e["module"] == src["module"]}
         echange_partout = {o["pokemon"] for o in obtentions if o["methode"] == "echange_version"
                            and set(src["versions"]) <= set(o["versions"])}
         attendus = {par_nom[n] for n, texte in indispo.items()
-                    if "change" in texte and n in par_nom and n not in connus}
+                    if isinstance(texte, str) and "change" in texte and n in par_nom and n not in connus
+                    and par_nom[n] in especes}
         for pid in sorted(attendus - echange_partout):
             avertir(f"[{src['module']}] Poképédia indique {especes[pid]['nom']} obtenable seulement par échange, "
                     f"le script le trouve obtenable en jeu")
@@ -344,25 +499,39 @@ def construire(jeu_id: str) -> None:
             avertir(f"[{src['module']}] Le script met {especes[pid]['nom']} en échange inter-versions, "
                     f"absent de la liste Indisponibles de Poképédia")
 
-    # Rapport
+
+def rapport(config, especes, lieux, obtentions) -> None:
     print(f"\n=== {config['nom']} ===")
     print(f"{len(especes)} Pokémon, {len(lieux)} lieux, {len(obtentions)} obtentions")
-    for v in versions:
+    autres = {}
+    for o in obtentions:
+        if o["methode"] == "autre":
+            autres[o["detail"]] = autres.get(o["detail"], 0) + 1
+    for v in [v["id"] for v in config["versions"]]:
         def a(methodes):
             return {o["pokemon"] for o in obtentions if v in o["versions"] and o["methode"] in methodes}
-        sauvages = a({"hautes_herbes", "marche", "surf", "peche", "fixe", "don", "echange_pnj", "achat", "fossile"})
-        evol = a({"evolution"}) - sauvages
+        en_jeu = a(METHODES_DIRECTES)
+        evol = a({"evolution"}) - en_jeu
         echange = a({"echange_version"})
-        autres = set(especes) - sauvages - evol - echange
-        print(f"  {v:6} : {len(sauvages)} en jeu, +{len(evol)} par évolution, {len(echange)} par échange inter-versions,"
-              f" reste {len(autres)} : {sorted(especes[x]['nom'] for x in autres)}")
+        reste = set(especes) - en_jeu - evol - echange
+        noms = sorted(especes[x]["nom"] for x in reste)
+        print(f"  {v:10} : {len(en_jeu)} en jeu, +{len(evol)} par évolution, {len(echange)} par échange,"
+              f" reste {len(reste)}{' : ' + ', '.join(noms[:15]) + ('…' if len(noms) > 15 else '') if noms else ''}")
+    if autres:
+        print(f"  Méthodes « autre » : {dict(sorted(autres.items(), key=lambda x: -x[1])[:12])}")
     if avertissements:
         print(f"\n{len(avertissements)} avertissement(s) :")
-        for a_ in avertissements:
+        for a_ in avertissements[:40]:
             print("  -", a_)
+        if len(avertissements) > 40:
+            print(f"  … et {len(avertissements) - 40} autres")
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         sys.exit(__doc__)
-    construire(sys.argv[1])
+    if sys.argv[1] == "tous":
+        for chemin in sorted(CONFIGS.glob("*.json"), key=lambda c: json.loads(c.read_text(encoding="utf-8"))["ordre"]):
+            construire(chemin.stem)
+    else:
+        construire(sys.argv[1])

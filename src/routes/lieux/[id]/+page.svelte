@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { sprite } from '$lib/donnees';
 	import { page } from '$app/state';
 	import { analyserLieux, decrire } from '$lib/analyse';
 	import BadgeType from '$lib/composants/BadgeType.svelte';
@@ -53,7 +54,7 @@
 		{#each pokemons as p (p.pokemon.id)}
 			{@const attrape = etat.estAttrape(p.pokemon.id)}
 			<li class:attrape>
-				<img src={p.pokemon.sprites[partie.version] ?? p.pokemon.artwork} alt="" width="56" height="56" loading="lazy" />
+				<img src={sprite(p.pokemon, partie.version)} alt="" width="56" height="56" loading="lazy" />
 				<div class="infos">
 					<div class="nom">
 						<a href="#/pokemon/{p.pokemon.id}">{p.pokemon.nom}</a>
