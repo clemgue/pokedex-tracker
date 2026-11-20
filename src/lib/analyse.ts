@@ -21,6 +21,7 @@ export const INFOS_METHODES: Record<Methode, { court: string; famille: Famille }
 	evolution: { court: 'Évolution', famille: 'evolution' },
 	evenement: { court: 'Événement', famille: 'echange' },
 	echange_version: { court: 'Autre version', famille: 'echange' },
+	transfert: { court: 'Transfert', famille: 'echange' },
 	bug: { court: 'Bug', famille: 'echange' }
 };
 const ORDRE_METHODES = Object.keys(INFOS_METHODES) as Methode[];

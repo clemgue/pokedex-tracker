@@ -31,6 +31,7 @@ METHODES = {
     "evenement": "Événement",
     "bug": "Bug",
     "autre": "Autre méthode",
+    "transfert": "Transfert depuis un autre jeu",
 }
 
 _ZONES_INTERIEURES = {"Rez-de-chaussée", "Étage", "Sous-sol"}

@@ -62,6 +62,23 @@
       ]
     }
   ],
-  "ordre_lieux": [],
+  "ordre_lieux": [
+    "Bourg Geon", "Route 29", "Ville Griotte", "Route 46", "Route 30", "Route 31", "Mauville",
+    "Tour Chétiflor", "Antre Noir", "Route 32", "Ruines d'Alpha", "Caves Jumelles", "Route 33", "Écorcia",
+    "Puits Ramoloss", "Bois aux Chênes", "Route 34", "Doublonville", "Centre Commercial de Doublonville",
+    "Casino de Doublonville", "Route 35", "Parc Naturel", "Route 36", "Route 37", "Rosalia", "Tour Cendrée",
+    "Route 38", "Route 39", "Oliville", "Chenal 40", "Chenal 41", "Irisia", "Tourb'Îles", "Route 42",
+    "Mont Creuset", "Route 43", "Lac Colère", "Repaire Rocket d'Acajou", "Route 44", "Route de Glace",
+    "Ébènelle", "Antre du Dragon", "Route 45", "Tour Carillon", "Route 27 (Kanto)", "Chutes Tohjo",
+    "Route 26 (Kanto)", "Route Victoire (Kanto)", "Carmin sur Mer", "Route 11 (Kanto)", "Grotte Taupiqueur",
+    "Route 6 (Kanto)", "Route 5 (Kanto)", "Azuria", "Arène d'Azuria", "Route 24 (Kanto)", "Route 25 (Kanto)",
+    "Route 9 (Kanto)", "Route 10 (Kanto)", "Centrale abandonnée", "Grotte Sombre", "Route 8 (Kanto)",
+    "Route 7 (Kanto)", "Céladopole", "Casino de Céladopole", "Route 16 (Kanto)", "Route 17 (Kanto)",
+    "Route 18 (Kanto)", "Parmanie", "Route 15 (Kanto)", "Route 14 (Kanto)", "Route 13 (Kanto)",
+    "Route 12 (Kanto)", "Chenal 19 (Kanto)", "Chenal 20 (Kanto)", "Cramois'Île", "Chenal 21 (Kanto)",
+    "Bourg Palette", "Route 1 (Kanto)", "Jadielle", "Route 22 (Kanto)", "Route 2 (Kanto)", "Argenta",
+    "Route 3 (Kanto)", "Mont Sélénite", "Route 4 (Kanto)", "Route 28 (Kanto)", "Mont Argenté",
+    "Grotte Argentée", "Pokémon nomade"
+  ],
   "corrections": {}
 }

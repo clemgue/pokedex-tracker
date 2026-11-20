@@ -418,9 +418,10 @@ def construire(jeu_id: str) -> None:
             avertir(f"Page Poképédia introuvable pour le Pokémon {p['nom']}")
 
     ordre_manuel = {page: i for i, page in enumerate(config.get("ordre_lieux", []), start=1)}
+    ordre_fourni = bool(ordre_manuel)
     restants = sorted((l for l in lieux.values() if l["page"] not in ordre_manuel), key=lambda l: tri_naturel(l["nom"]))
     for i, l in enumerate(restants, start=len(ordre_manuel) + 1):
-        if ordre_manuel:
+        if ordre_fourni:
             avertir(f"Lieu absent de ordre_lieux : {l['page']}")
         ordre_manuel[l["page"]] = i
     for page in config.get("ordre_lieux", []):
@@ -533,5 +534,8 @@ if __name__ == "__main__":
     if sys.argv[1] == "tous":
         for chemin in sorted(CONFIGS.glob("*.json"), key=lambda c: json.loads(c.read_text(encoding="utf-8"))["ordre"]):
             construire(chemin.stem)
+        import transferts
+        print("\n##### Transferts entre jeux #####")
+        transferts.lier_transferts()
     else:
         construire(sys.argv[1])

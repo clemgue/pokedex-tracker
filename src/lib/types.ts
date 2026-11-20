@@ -66,7 +66,8 @@ export type Methode =
 	| 'echange_version'
 	| 'evenement'
 	| 'bug'
-	| 'autre';
+	| 'autre'
+	| 'transfert';
 
 /** Les champs vides sont omis dans les fichiers de données. */
 export interface Obtention {
