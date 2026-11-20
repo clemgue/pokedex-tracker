@@ -4,7 +4,7 @@
  */
 import { db } from './db';
 import { chargerIndex, chargerJeu } from './donnees';
-import type { DonneesJeu, InfoJeu, Partie } from './types';
+import type { Capture, DonneesJeu, InfoJeu, Partie } from './types';
 
 class Etat {
 	pret = $state(false);
@@ -100,12 +100,24 @@ class Etat {
 		return this.partieActive?.captures[pokemon]?.attrape ?? false;
 	}
 
-	async basculerCapture(pokemon: number) {
+	capture(pokemon: number): Capture | undefined {
+		return this.partieActive?.captures[pokemon];
+	}
+
+	/** Modifie la capture d'un Pokémon (attrapé, chromatique, note…) et l'enregistre. */
+	async modifierCapture(pokemon: number, modif: Partial<Omit<Capture, 'maj'>>) {
 		const partie = this.partieActive;
 		if (!partie) return;
-		const actuelle = partie.captures[pokemon];
-		partie.captures[pokemon] = { ...actuelle, attrape: !actuelle?.attrape, maj: Date.now() };
+		const actuelle = partie.captures[pokemon] ?? { attrape: false, maj: 0 };
+		const suivante: Capture = { ...actuelle, ...modif, maj: Date.now() };
+		// Un chromatique ou une forme obtenue implique que le Pokémon est attrapé
+		if (modif.shiny || (modif.formes && Object.values(modif.formes).some(Boolean))) suivante.attrape = true;
+		partie.captures[pokemon] = suivante;
 		await this.sauver(partie);
+	}
+
+	async basculerCapture(pokemon: number) {
+		await this.modifierCapture(pokemon, { attrape: !this.estAttrape(pokemon) });
 	}
 }
 

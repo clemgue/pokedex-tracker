@@ -1,32 +1,26 @@
 <script lang="ts">
-	import { analyserVersion, decrire, methodesPresentes, type FichePokedex } from '$lib/analyse';
+	import { analyserVersion, methodesPresentes, type FichePokedex } from '$lib/analyse';
 	import BadgeType from '$lib/composants/BadgeType.svelte';
+	import ListeObtentions from '$lib/composants/ListeObtentions.svelte';
 	import PuceMethode from '$lib/composants/PuceMethode.svelte';
 	import BoutonCapture from '$lib/composants/BoutonCapture.svelte';
 	import NouvellePartie from '$lib/composants/NouvellePartie.svelte';
 	import { normaliser, numero } from '$lib/donnees';
 	import { etat } from '$lib/etat.svelte';
-	import type { Methode } from '$lib/types';
-
-	type Statut = 'tous' | 'manquants' | 'attrapes';
-	type Special = '' | 'exclusifs' | 'echange';
-
-	let recherche = $state('');
-	let statut = $state<Statut>('tous');
-	let methode = $state<'' | Methode>('');
-	let lieu = $state('');
-	let type = $state('');
-	let special = $state<Special>('');
-	let tri = $state<'numero' | 'nom'>('numero');
-	let pokedexId = $state('');
+	import { filtres as F, reinitialiserFiltres, type Statut } from '$lib/filtres.svelte';
 
 	let partie = $derived(etat.partieActive);
+
+	$effect.pre(() => {
+		// Nouvelle partie active : filtres remis à zéro
+		if (partie && F.partie !== partie.id) reinitialiserFiltres(partie.id);
+	});
 	let donnees = $derived(etat.donnees);
 	let version = $derived(donnees?.jeu.versions.find((v) => v.id === partie?.version));
 
 	let fiches = $derived(
 		donnees && partie && donnees.jeu.id === partie.jeu
-			? analyserVersion(donnees, partie.version, pokedexId || undefined)
+			? analyserVersion(donnees, partie.version, F.pokedexId || undefined)
 			: []
 	);
 
@@ -41,14 +35,14 @@
 
 	function correspond(f: FichePokedex): boolean {
 		const attrape = etat.estAttrape(f.pokemon.id);
-		if (statut === 'attrapes' && !attrape) return false;
-		if (statut === 'manquants' && attrape) return false;
-		if (methode && !f.methodes.has(methode)) return false;
-		if (lieu && !f.lieux.has(lieu)) return false;
-		if (type && !f.pokemon.types.includes(type)) return false;
-		if (special === 'exclusifs' && !f.exclusif) return false;
-		if (special === 'echange' && !f.parEchange) return false;
-		const q = normaliser(recherche);
+		if (F.statut === 'attrapes' && !attrape) return false;
+		if (F.statut === 'manquants' && attrape) return false;
+		if (F.methode && !f.methodes.has(F.methode)) return false;
+		if (F.lieu && !f.lieux.has(F.lieu)) return false;
+		if (F.type && !f.pokemon.types.includes(F.type)) return false;
+		if (F.special === 'exclusifs' && !f.exclusif) return false;
+		if (F.special === 'echange' && !f.parEchange) return false;
+		const q = normaliser(F.recherche);
 		if (q) {
 			const n = String(f.numero);
 			const textes = [normaliser(f.pokemon.nom), normaliser(f.pokemon.nom_en)];
@@ -60,21 +54,16 @@
 
 	let visibles = $derived.by(() => {
 		const liste = fiches.filter(correspond);
-		if (tri === 'nom') liste.sort((a, b) => a.pokemon.nom.localeCompare(b.pokemon.nom, 'fr'));
+		if (F.tri === 'nom') liste.sort((a, b) => a.pokemon.nom.localeCompare(b.pokemon.nom, 'fr'));
 		return liste;
 	});
 
-	let nbFiltres = $derived(
-		[statut !== 'tous', methode, lieu, type, special].filter(Boolean).length
-	);
+	let nbFiltres = $derived([F.statut !== 'tous', F.methode, F.lieu, F.type, F.special].filter(Boolean).length);
 
 	function reinitialiser() {
-		recherche = '';
-		statut = 'tous';
-		methode = '';
-		lieu = '';
-		type = '';
-		special = '';
+		const { tri, pokedexId } = F;
+		reinitialiserFiltres();
+		Object.assign(F, { tri, pokedexId });
 	}
 
 	const statuts: { id: Statut; libelle: string }[] = [
@@ -111,7 +100,7 @@
 				class="champ"
 				type="search"
 				placeholder="Nom (FR ou EN) ou numéro…"
-				bind:value={recherche}
+				bind:value={F.recherche}
 				autocomplete="off"
 			/>
 		</div>
@@ -121,9 +110,9 @@
 				<button
 					type="button"
 					role="radio"
-					aria-checked={statut === s.id}
-					class:actif={statut === s.id}
-					onclick={() => (statut = s.id)}>{s.libelle}</button
+					aria-checked={F.statut === s.id}
+					class:actif={F.statut === s.id}
+					onclick={() => (F.statut = s.id)}>{s.libelle}</button
 				>
 			{/each}
 		</div>
@@ -134,7 +123,7 @@
 				{#if donnees.pokedex.length > 1}
 					<div>
 						<label class="etiquette" for="f-pokedex">Pokédex</label>
-						<select id="f-pokedex" class="champ" bind:value={pokedexId}>
+						<select id="f-pokedex" class="champ" bind:value={F.pokedexId}>
 							{#each donnees.pokedex as p, i (p.id)}
 								<option value={i === 0 ? '' : p.id}>{p.nom}</option>
 							{/each}
@@ -143,7 +132,7 @@
 				{/if}
 				<div>
 					<label class="etiquette" for="f-methode">Méthode</label>
-					<select id="f-methode" class="champ" bind:value={methode}>
+					<select id="f-methode" class="champ" bind:value={F.methode}>
 						<option value="">Toutes</option>
 						{#each methodes as m (m.id)}
 							<option value={m.id}>{m.nom}</option>
@@ -152,7 +141,7 @@
 				</div>
 				<div>
 					<label class="etiquette" for="f-lieu">Lieu</label>
-					<select id="f-lieu" class="champ" bind:value={lieu}>
+					<select id="f-lieu" class="champ" bind:value={F.lieu}>
 						<option value="">Tous</option>
 						{#each lieuxVersion as l (l.id)}
 							<option value={l.id}>{l.nom}</option>
@@ -161,7 +150,7 @@
 				</div>
 				<div>
 					<label class="etiquette" for="f-type">Type</label>
-					<select id="f-type" class="champ" bind:value={type}>
+					<select id="f-type" class="champ" bind:value={F.type}>
 						<option value="">Tous</option>
 						{#each types as t (t)}
 							<option value={t}>{t}</option>
@@ -170,7 +159,7 @@
 				</div>
 				<div>
 					<label class="etiquette" for="f-special">Exclusivités</label>
-					<select id="f-special" class="champ" bind:value={special}>
+					<select id="f-special" class="champ" bind:value={F.special}>
 						<option value="">Toutes</option>
 						<option value="exclusifs">Exclusifs de ma version</option>
 						<option value="echange">À obtenir par échange</option>
@@ -178,7 +167,7 @@
 				</div>
 				<div>
 					<label class="etiquette" for="f-tri">Tri</label>
-					<select id="f-tri" class="champ" bind:value={tri}>
+					<select id="f-tri" class="champ" bind:value={F.tri}>
 						<option value="numero">Numéro</option>
 						<option value="nom">Nom</option>
 					</select>
@@ -189,7 +178,7 @@
 
 	<p class="resultats" aria-live="polite">
 		{visibles.length} Pokémon
-		{#if visibles.length !== fiches.length || recherche}
+		{#if visibles.length !== fiches.length || F.recherche}
 			<button type="button" class="lien" onclick={reinitialiser}>Réinitialiser</button>
 		{/if}
 	</p>
@@ -210,7 +199,7 @@
 					/>
 					<div class="infos">
 						<div class="nom">
-							<span>{f.pokemon.nom}</span>
+							<a class="lien-fiche" href="#/pokemon/{f.pokemon.id}">{f.pokemon.nom}</a>
 							{#each f.pokemon.types as t (t)}
 								<BadgeType type={t} />
 							{/each}
@@ -229,25 +218,7 @@
 									<span class="resume">{f.resume}</span>
 									<svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
 								</summary>
-								<ul class="detail">
-									{#each f.parLieu as g (g.lieu.id)}
-										<li>
-											{#if g.lieu.url_pokepedia}
-												<a class="lieu" href={g.lieu.url_pokepedia} target="_blank" rel="noopener">{g.lieu.nom}</a>
-											{:else}
-												<span class="lieu">{g.lieu.nom}</span>
-											{/if}
-											<ul>
-												{#each g.obtentions as o (o.id)}
-													<li><PuceMethode methode={o.methode} /> {decrire(o, donnees, false)}</li>
-												{/each}
-											</ul>
-										</li>
-									{/each}
-									{#each f.sansLieu as o (o.id)}
-										<li><PuceMethode methode={o.methode} /> {decrire(o, donnees, false)}</li>
-									{/each}
-								</ul>
+								<ListeObtentions parLieu={f.parLieu} sansLieu={f.sansLieu} {donnees} />
 							</details>
 						{:else}
 							<div class="obtention simple" class:echange={f.parEchange}>
@@ -474,27 +445,11 @@
 	.obtention[open] .chevron {
 		transform: rotate(180deg);
 	}
-	.detail {
-		display: grid;
-		gap: 6px;
-		margin: 6px 0 4px;
-		padding: 8px 10px;
-		border-radius: 8px;
-		background: var(--ecran-alt);
-		box-shadow: inset 0 0 0 1px var(--ecran-ligne);
-		list-style: none;
-		color: var(--ecran-texte);
+	.lien-fiche {
+		text-decoration: none;
 	}
-	.detail ul {
-		display: grid;
-		gap: 3px;
-		margin: 2px 0 0;
-		padding: 0 0 0 10px;
-		list-style: none;
-		color: var(--ecran-texte-doux);
-	}
-	.lieu {
-		font-weight: 700;
+	.lien-fiche:hover {
+		text-decoration: underline;
 	}
 	.etiquette-ex {
 		padding: 0 6px;
@@ -504,7 +459,7 @@
 		font-weight: 700;
 		text-transform: uppercase;
 	}
-	.attrape .nom > span:first-child {
+	.attrape .lien-fiche {
 		color: var(--attrape);
 	}
 	.pokepedia {

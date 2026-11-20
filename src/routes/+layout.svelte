@@ -12,8 +12,9 @@
 	});
 
 	const liens = [
-		{ href: '#/', libelle: 'Pokédex', route: '/' },
-		{ href: '#/parties', libelle: 'Parties', route: '/parties' }
+		{ href: '#/', libelle: 'Pokédex', route: '/', aussi: ['/pokemon/[id]'] },
+		{ href: '#/lieux', libelle: 'Lieux', route: '/lieux', aussi: ['/lieux/[id]'] },
+		{ href: '#/parties', libelle: 'Parties', route: '/parties', aussi: [] }
 	];
 </script>
 
@@ -36,7 +37,11 @@
 
 	<nav class="onglets" aria-label="Navigation principale">
 		{#each liens as lien (lien.route)}
-			<a href={lien.href} aria-current={page.route.id === lien.route ? 'page' : undefined}>{lien.libelle}</a>
+			<a
+				href={lien.href}
+				aria-current={page.route.id === lien.route || lien.aussi.includes(page.route.id ?? '') ? 'page' : undefined}
+				>{lien.libelle}</a
+			>
 		{/each}
 	</nav>
 

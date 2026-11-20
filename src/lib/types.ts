@@ -88,6 +88,11 @@ export interface DonneesJeu {
 export interface Capture {
 	attrape: boolean;
 	shiny?: boolean;
+	/** Formes obtenues (clé : identifiant de forme) */
+	formes?: Record<string, boolean>;
+	/** Méga-Gemme obtenue */
+	mega?: boolean;
+	note?: string;
 	/** Horodatage de la dernière modification (fusion lors de la synchronisation) */
 	maj: number;
 }

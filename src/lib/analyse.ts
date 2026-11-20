@@ -133,6 +133,85 @@ export function decrire(o: Obtention, donnees: DonneesJeu, avecMethode = true): 
 	return parties.join(' · ');
 }
 
+export interface PokemonDuLieu {
+	pokemon: Pokemon;
+	obtentions: Obtention[];
+}
+
+export interface FicheLieu {
+	lieu: Lieu;
+	pokemons: PokemonDuLieu[];
+}
+
+/** Lieux de la version (ordre de progression) et Pokémon obtenables dans chacun. */
+export function analyserLieux(donnees: DonneesJeu, version: string): FicheLieu[] {
+	const pokemons = new Map(donnees.pokemon.map((p) => [p.id, p]));
+	const parLieu = new Map<string, Map<number, Obtention[]>>();
+	for (const o of donnees.obtentions) {
+		if (!o.lieu || o.glitch || !o.versions.includes(version)) continue;
+		const m = parLieu.get(o.lieu) ?? new Map<number, Obtention[]>();
+		m.set(o.pokemon, [...(m.get(o.pokemon) ?? []), o]);
+		parLieu.set(o.lieu, m);
+	}
+	return donnees.lieux
+		.filter((l) => l.versions.includes(version) && parLieu.has(l.id))
+		.map((lieu) => ({
+			lieu,
+			pokemons: [...parLieu.get(lieu.id)!]
+				.sort(([a], [b]) => a - b)
+				.map(([id, obtentions]) => ({ pokemon: pokemons.get(id)!, obtentions }))
+		}));
+}
+
+export interface NoeudEvolution {
+	pokemon: Pokemon;
+	/** Condition pour atteindre ce stade depuis le précédent */
+	condition: string | null;
+	suivants: NoeudEvolution[];
+}
+
+/** Chaîne d'évolution complète contenant `id`, déduite des obtentions « évolution » du jeu. */
+export function chaineEvolution(donnees: DonneesJeu, id: number): NoeudEvolution | null {
+	const pokemons = new Map(donnees.pokemon.map((p) => [p.id, p]));
+	const suivants = new Map<number, Map<number, string | null>>();
+	const precedent = new Map<number, number>();
+	for (const o of donnees.obtentions) {
+		if (o.methode !== 'evolution' || !o.depuis) continue;
+		const m = suivants.get(o.depuis) ?? new Map();
+		if (!m.has(o.pokemon)) m.set(o.pokemon, o.detail);
+		suivants.set(o.depuis, m);
+		precedent.set(o.pokemon, o.depuis);
+	}
+	let racine = id;
+	while (precedent.has(racine)) racine = precedent.get(racine)!;
+	if (!suivants.has(racine)) return null; // pas d'évolution
+
+	// « Faire évoluer Évoli avec une Pierre Eau » → « Pierre Eau » ; « … au niveau 16 » → « Niveau 16 »
+	const raccourcir = (cond: string | null, pre: Pokemon): string | null => {
+		if (!cond) return null;
+		const court = cond
+			.split(' ou ')
+			.map((c) =>
+				c
+					.replace(`Faire évoluer ${pre.nom}`, '')
+					.replace(/^\s*(avec une?|avec|au)\s+/, '')
+					.replace(/^\s*par échange/, 'Échange')
+					.trim()
+			)
+			.filter(Boolean)
+			.join(' ou ');
+		return court ? court[0].toUpperCase() + court.slice(1) : null;
+	};
+	const construire = (pid: number, condition: string | null): NoeudEvolution => ({
+		pokemon: pokemons.get(pid)!,
+		condition,
+		suivants: [...(suivants.get(pid) ?? new Map())].map(([post, cond]) =>
+			construire(post, raccourcir(cond, pokemons.get(pid)!))
+		)
+	});
+	return construire(racine, null);
+}
+
 /** Méthodes présentes, pour le filtre */
 export function methodesPresentes(fiches: FichePokedex[], donnees: DonneesJeu): { id: Methode; nom: string }[] {
 	const presentes = new Set(fiches.flatMap((f) => [...f.methodes]));
