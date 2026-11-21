@@ -1,5 +1,5 @@
 import { base } from '$app/paths';
-import type { DonneesJeu, InfoJeu, Pokemon } from './types';
+import type { DonneesJeu, DonneesProgression, InfoJeu, Pokemon } from './types';
 
 const cache = new Map<string, Promise<DonneesJeu>>();
 
@@ -11,6 +11,20 @@ async function lireJson<T>(chemin: string): Promise<T> {
 
 export function chargerIndex(): Promise<InfoJeu[]> {
 	return lireJson<{ jeux: InfoJeu[] }>('index.json').then((i) => i.jeux);
+}
+
+let progression: Promise<DonneesProgression> | null = null;
+
+/** Étapes de l'aventure (badges, Conseil 4…) de tous les jeux, chargées une seule fois. */
+export function chargerProgression(): Promise<DonneesProgression> {
+	if (!progression) {
+		progression = fetch(`${base}/data/progression.json`).then((rep) => {
+			if (!rep.ok) throw new Error(`Impossible de charger progression.json (${rep.status})`);
+			return rep.json();
+		});
+		progression.catch(() => (progression = null));
+	}
+	return progression;
 }
 
 export function chargerJeu(id: string): Promise<DonneesJeu> {

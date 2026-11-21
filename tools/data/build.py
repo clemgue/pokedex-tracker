@@ -468,9 +468,12 @@ def construire(jeu_id: str) -> None:
 
     index_path = SORTIE / "index.json"
     index = json.loads(index_path.read_text(encoding="utf-8")) if index_path.exists() else {"jeux": []}
-    index["jeux"] = [j for j in index["jeux"] if j["id"] != jeu_id] + [{**jeu, "fichier": f"{jeu_id}.json"}]
+    # Pokédex principal (le premier) : sert au pourcentage d'avancement de chaque partie sans charger le jeu
+    principal = {"id": pokedexes[0]["id"], "pokemon": [e["pokemon"] for e in pokedexes[0]["entrees"]]}
+    index["jeux"] = [j for j in index["jeux"] if j["id"] != jeu_id] + [
+        {**jeu, "fichier": f"{jeu_id}.json", "pokedex_principal": principal}]
     index["jeux"].sort(key=lambda j: j["ordre"])
-    ecrire_json(index_path, index, compact=False)
+    ecrire_json(index_path, index, compact=True)
 
     controler_indisponibles(config, especes, obtentions, par_nom)
     rapport(config, especes, lieux, obtentions)

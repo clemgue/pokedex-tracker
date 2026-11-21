@@ -16,6 +16,36 @@ export interface InfoJeu {
 	ordre: number;
 	versions: VersionJeu[];
 	fichier?: string;
+	/** Pokédex principal (index.json) : pour l'avancement d'une partie sans charger tout le jeu */
+	pokedex_principal?: { id: string; pokemon: number[] };
+}
+
+// --- Progression de l'aventure (badges, Conseil 4…) — static/data/progression.json ---
+
+export interface Etape {
+	/** Identifiant unique dans le jeu (une même étape peut avoir une entrée par version) */
+	id: string;
+	nom: string;
+	personne?: string;
+	lieu?: string;
+	type?: string;
+	/** Absent : toutes les versions */
+	versions?: string[];
+	note?: string;
+	url_personne?: string;
+	url_lieu?: string;
+}
+
+export interface GroupeEtapes {
+	id: string;
+	titre: string;
+	etapes: Etape[];
+}
+
+export interface DonneesProgression {
+	format: number;
+	/** final : étape (« groupe/étape ») qui marque la fin de l'histoire principale */
+	jeux: Record<string, { final: string; groupes: GroupeEtapes[] }>;
 }
 
 export interface Pokedex {
@@ -122,4 +152,12 @@ export interface Partie {
 	modifiee: number;
 	/** Clé : numéro national du Pokémon */
 	captures: Record<string, Capture>;
+	/** Étapes de l'aventure franchies (clé : « groupe/étape », ex. « arenes/roche ») */
+	etapes?: Record<string, EtapeFaite>;
+}
+
+export interface EtapeFaite {
+	fait: boolean;
+	/** Horodatage (fusion lors de la synchronisation) */
+	maj: number;
 }

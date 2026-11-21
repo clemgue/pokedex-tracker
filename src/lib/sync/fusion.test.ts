@@ -26,6 +26,17 @@ describe('fusionner', () => {
 		expect(c[7].attrape).toBe(true); // seulement sur le téléphone
 	});
 
+	it('fusionne les étapes (badges) une à une, même absentes d’une copie', () => {
+		const pc = { ...partie('a', 10), etapes: { 'arenes/roche': { fait: true, maj: 5 } } };
+		const tel = { ...partie('a', 20), etapes: { 'arenes/roche': { fait: false, maj: 3 }, 'arenes/cascade': { fait: true, maj: 4 } } };
+		const ancienne = partie('a', 30); // copie d'une version de l'appli sans étapes
+		const r = fusionner(fusionner(fichier([pc]), fichier([tel])), fichier([ancienne]));
+		expect(r.parties[0].etapes).toEqual({
+			'arenes/roche': { fait: true, maj: 5 },
+			'arenes/cascade': { fait: true, maj: 4 }
+		});
+	});
+
 	it('prend le nom de la copie la plus récemment modifiée', () => {
 		const r = fusionner(fichier([partie('a', 10, {}, 'Ancien')]), fichier([partie('a', 20, {}, 'Nouveau')]));
 		expect(r.parties[0].nom).toBe('Nouveau');

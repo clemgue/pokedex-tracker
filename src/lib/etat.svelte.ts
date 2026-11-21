@@ -3,9 +3,9 @@
  * Chaque modification est écrite immédiatement dans IndexedDB.
  */
 import { db } from './db';
-import { chargerIndex, chargerJeu } from './donnees';
+import { chargerIndex, chargerJeu, chargerProgression } from './donnees';
 import { FORMAT_FICHIER, type FichierProgression } from './sync/fusion';
-import type { Capture, DonneesJeu, InfoJeu, Partie } from './types';
+import type { Capture, DonneesJeu, DonneesProgression, InfoJeu, Partie } from './types';
 
 class Etat {
 	pret = $state(false);
@@ -14,6 +14,8 @@ class Etat {
 	parties = $state<Partie[]>([]);
 	partieActiveId = $state<string | null>(null);
 	donnees = $state.raw<DonneesJeu | null>(null);
+	/** Étapes de l'aventure de tous les jeux (badges…) ; null tant que non chargées */
+	progression = $state.raw<DonneesProgression | null>(null);
 	chargementJeu = $state(false);
 	/** Marqueurs de suppression (identifiant → date), pour propager les suppressions à la synchro */
 	supprimees: Record<string, number> = {};
@@ -24,6 +26,10 @@ class Etat {
 
 	async init() {
 		if (this.pret) return;
+		// Non bloquant : seules les vues Badges et Parties en ont besoin
+		chargerProgression()
+			.then((p) => (this.progression = p))
+			.catch(() => {});
 		try {
 			const [jeux, parties, active, supprimees] = await Promise.all([
 				chargerIndex(),
@@ -156,6 +162,19 @@ class Etat {
 
 	async basculerCapture(pokemon: number) {
 		await this.modifierCapture(pokemon, { attrape: !this.estAttrape(pokemon) });
+	}
+
+	estFaite(cle: string): boolean {
+		return !!this.partieActive?.etapes?.[cle]?.fait;
+	}
+
+	/** Coche / décoche une étape de l'aventure (badge, Conseil 4…) ; clé « groupe/étape ». */
+	async basculerEtape(cle: string) {
+		const partie = this.partieActive;
+		if (!partie) return;
+		partie.etapes ??= {};
+		partie.etapes[cle] = { fait: !this.estFaite(cle), maj: Date.now() };
+		await this.sauver(partie);
 	}
 
 	async basculerChromatique(pokemon: number) {

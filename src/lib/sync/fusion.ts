@@ -5,10 +5,11 @@
  * - parties : union par identifiant ;
  * - métadonnées d'une partie (nom…) : la copie modifiée le plus récemment l'emporte ;
  * - captures : Pokémon par Pokémon, la capture la plus récente (`maj`) l'emporte ;
+ * - étapes de l'aventure (badges…) : même règle, étape par étape ;
  * - suppressions : une partie supprimée (marqueur horodaté) disparaît si elle n'a pas été
  *   modifiée après sa suppression.
  */
-import type { Capture, Partie } from '$lib/types';
+import type { Capture, EtapeFaite, Partie } from '$lib/types';
 
 export const FORMAT_FICHIER = 1;
 
@@ -36,8 +37,9 @@ export function valider(donnees: unknown): FichierProgression {
 	return { ...fichierVide(), ...f, supprimees: f.supprimees ?? {} } as FichierProgression;
 }
 
-function fusionnerCaptures(a: Record<string, Capture>, b: Record<string, Capture>): Record<string, Capture> {
-	const resultat: Record<string, Capture> = { ...a };
+/** Fusion élément par élément : l'entrée la plus récente (`maj`) l'emporte. */
+function fusionnerParMaj<T extends { maj: number }>(a: Record<string, T>, b: Record<string, T>): Record<string, T> {
+	const resultat: Record<string, T> = { ...a };
 	for (const [cle, cb] of Object.entries(b)) {
 		const ca = resultat[cle];
 		if (!ca || (cb.maj ?? 0) > (ca.maj ?? 0)) resultat[cle] = cb;
@@ -47,12 +49,14 @@ function fusionnerCaptures(a: Record<string, Capture>, b: Record<string, Capture
 
 function fusionnerPartie(a: Partie, b: Partie): Partie {
 	const recente = b.modifiee > a.modifiee ? b : a;
-	return {
+	const fusion: Partie = {
 		...recente,
 		creee: Math.min(a.creee, b.creee),
 		modifiee: Math.max(a.modifiee, b.modifiee),
-		captures: fusionnerCaptures(a.captures, b.captures)
+		captures: fusionnerParMaj<Capture>(a.captures, b.captures)
 	};
+	if (a.etapes || b.etapes) fusion.etapes = fusionnerParMaj<EtapeFaite>(a.etapes ?? {}, b.etapes ?? {});
+	return fusion;
 }
 
 export function fusionner(a: FichierProgression, b: FichierProgression): FichierProgression {

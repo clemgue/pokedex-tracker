@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import BasculeTheme from '$lib/composants/BasculeTheme.svelte';
+	import RetourHaut from '$lib/composants/RetourHaut.svelte';
 	import { etat } from '$lib/etat.svelte';
 	import { synchro } from '$lib/sync/sync.svelte';
 
@@ -24,6 +25,7 @@
 	const liens = [
 		{ href: '#/', libelle: 'Pokédex', route: '/', aussi: ['/pokemon/[id]'] },
 		{ href: '#/lieux', libelle: 'Lieux', route: '/lieux', aussi: ['/lieux/[id]'] },
+		{ href: '#/badges', libelle: 'Badges', route: '/badges', aussi: [] },
 		{ href: '#/stats', libelle: 'Bilan', route: '/stats', aussi: [] },
 		{ href: '#/parties', libelle: 'Parties', route: '/parties', aussi: [] }
 	];
@@ -78,6 +80,8 @@
 			{/if}
 		</div>
 	</main>
+
+	<RetourHaut />
 
 	<footer class="pied">
 		Données : <a href="https://www.pokepedia.fr/" target="_blank" rel="noopener">Poképédia</a> (CC BY-NC-SA)

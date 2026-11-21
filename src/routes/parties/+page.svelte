@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { avancement, LIBELLES_STATUT } from '$lib/aventure';
 	import NouvellePartie from '$lib/composants/NouvellePartie.svelte';
 	import { etat } from '$lib/etat.svelte';
 	import type { Partie } from '$lib/types';
@@ -11,8 +12,7 @@
 	function infos(p: Partie) {
 		const jeu = etat.jeux.find((j) => j.id === p.jeu);
 		const version = jeu?.versions.find((v) => v.id === p.version);
-		const attrapes = Object.values(p.captures).filter((c) => c.attrape).length;
-		return { jeu, version, attrapes };
+		return { jeu, version, av: avancement(p, jeu, etat.progression) };
 	}
 
 	async function choisir(id: string) {
@@ -57,9 +57,32 @@
 					</div>
 				{:else}
 					<div class="infos">
-						<strong>{p.nom}</strong>
+						<div class="entete">
+							<strong>{p.nom}</strong>
+							<span class="statut statut-{i.av.statut}">{LIBELLES_STATUT[i.av.statut]}</span>
+						</div>
 						<span>{i.jeu?.nom ?? p.jeu} — {i.version?.nom ?? p.version}</span>
-						<span>{i.attrapes} Pokémon attrapé{i.attrapes > 1 ? 's' : ''}</span>
+						{#if i.av.total}
+							<div class="avancement">
+								<div
+									class="barre"
+									role="progressbar"
+									aria-label="Pokédex"
+									aria-valuemin="0"
+									aria-valuemax={i.av.total}
+									aria-valuenow={i.av.attrapes}
+								>
+									<span style:width="{i.av.pourcentage}%"></span>
+								</div>
+								<span class="chiffres"><strong>{i.av.pourcentage} %</strong> · {i.av.attrapes} / {i.av.total}</span>
+							</div>
+						{/if}
+						{#if i.av.premierGroupe}
+							<span>
+								{i.av.premierGroupe.titre} : {i.av.premierGroupe.faits} / {i.av.premierGroupe.total}
+								{#if i.av.histoireFinie}· histoire terminée{/if}
+							</span>
+						{/if}
 					</div>
 					<div class="actions">
 						{#if p.id === etat.partieActiveId}
@@ -113,11 +136,61 @@
 	}
 	.infos {
 		display: grid;
-		gap: 2px;
+		gap: 4px;
+		flex: 1;
+		min-width: 220px;
 	}
-	.infos span {
+	.infos > span {
 		font-size: 0.85rem;
 		color: var(--ecran-texte-doux);
+	}
+	.entete {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 4px 10px;
+	}
+	.statut {
+		padding: 1px 10px;
+		border-radius: 999px;
+		font-size: 0.75rem;
+		font-weight: 700;
+		border: 1px solid currentColor;
+		color: var(--ecran-texte-doux);
+	}
+	.statut-en_cours {
+		color: var(--lentille);
+	}
+	.statut-terminee {
+		color: var(--progression);
+	}
+	.statut-complete {
+		background: var(--progression);
+		border-color: var(--progression);
+		color: #fff;
+	}
+	.avancement {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		max-width: 420px;
+	}
+	.barre {
+		flex: 1;
+		height: 10px;
+		border-radius: 999px;
+		background: var(--ecran-ligne);
+		overflow: hidden;
+	}
+	.barre span {
+		display: block;
+		height: 100%;
+		background: var(--couleur, var(--progression));
+	}
+	.chiffres {
+		font-family: var(--police-ecran);
+		font-size: 0.8rem;
+		white-space: nowrap;
 	}
 	.actions,
 	.renommer {
