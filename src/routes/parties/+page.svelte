@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { avancement, LIBELLES_STATUT } from '$lib/aventure';
+	import { avancement } from '$lib/aventure';
+	import StatutPartie from '$lib/composants/StatutPartie.svelte';
 	import NouvellePartie from '$lib/composants/NouvellePartie.svelte';
 	import { etat } from '$lib/etat.svelte';
 	import type { Partie } from '$lib/types';
@@ -59,7 +60,7 @@
 					<div class="infos">
 						<div class="entete">
 							<strong>{p.nom}</strong>
-							<span class="statut statut-{i.av.statut}">{LIBELLES_STATUT[i.av.statut]}</span>
+							<StatutPartie av={i.av} />
 						</div>
 						<span>{i.jeu?.nom ?? p.jeu} — {i.version?.nom ?? p.version}</span>
 						{#if i.av.total}
@@ -78,10 +79,7 @@
 							</div>
 						{/if}
 						{#if i.av.premierGroupe}
-							<span>
-								{i.av.premierGroupe.titre} : {i.av.premierGroupe.faits} / {i.av.premierGroupe.total}
-								{#if i.av.histoireFinie}· histoire terminée{/if}
-							</span>
+							<span>{i.av.premierGroupe.titre} : {i.av.premierGroupe.faits} / {i.av.premierGroupe.total}</span>
 						{/if}
 					</div>
 					<div class="actions">
@@ -149,25 +147,6 @@
 		flex-wrap: wrap;
 		align-items: center;
 		gap: 4px 10px;
-	}
-	.statut {
-		padding: 1px 10px;
-		border-radius: 999px;
-		font-size: 0.75rem;
-		font-weight: 700;
-		border: 1px solid currentColor;
-		color: var(--ecran-texte-doux);
-	}
-	.statut-en_cours {
-		color: var(--lentille);
-	}
-	.statut-terminee {
-		color: var(--progression);
-	}
-	.statut-complete {
-		background: var(--progression);
-		border-color: var(--progression);
-		color: #fff;
 	}
 	.avancement {
 		display: flex;

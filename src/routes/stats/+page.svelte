@@ -2,6 +2,8 @@
 	import { sprite } from '$lib/donnees';
 	import { analyserVersion, INFOS_METHODES, type FichePokedex } from '$lib/analyse';
 	import PuceMethode from '$lib/composants/PuceMethode.svelte';
+	import StatutPartie from '$lib/composants/StatutPartie.svelte';
+	import { avancement } from '$lib/aventure';
 	import { etat } from '$lib/etat.svelte';
 	import type { Methode } from '$lib/types';
 
@@ -37,7 +39,11 @@
 	let aEchanger = $derived(manquants.filter((f) => f.parEchange));
 	let introuvables = $derived(fiches.filter((f) => !f.obtentions.length));
 
-	let nbShiny = $derived(partie ? Object.values(partie.captures).filter((c) => c.shiny).length : 0);
+	let av = $derived(
+		partie ? avancement(partie, etat.jeux.find((j) => j.id === partie.jeu), etat.progression) : null
+	);
+
+	let nbShiny =$derived(partie ? Object.values(partie.captures).filter((c) => c.shiny).length : 0);
 
 	/** Formes et Méga-évolutions : obtenues / total, par type */
 	function compterVariantes(type: 'forme' | 'mega') {
@@ -64,7 +70,10 @@
 	<p class="vide"><a href="#/">Choisis d'abord une partie.</a></p>
 {:else}
 	<h1>Bilan</h1>
-	<p class="intro">{partie.nom} — {donnees.jeu.nom} ({version?.nom})</p>
+	<p class="intro">
+		{partie.nom} — {donnees.jeu.nom} ({version?.nom})
+		{#if av}<StatutPartie {av} />{/if}
+	</p>
 
 	<section class="tuiles">
 		{#each parPokedex as p (p.pokedex.id)}
@@ -100,6 +109,29 @@
 			</div>
 		{/if}
 	</section>
+
+	{#if av?.groupes.length}
+		<section>
+			<h2 class="avec-lien">Badges et Ligue <a href="#/badges">Tout voir →</a></h2>
+			<div class="tuiles">
+				{#each av.groupes as g (g.id)}
+					{@const pc = pourcent(g.faits, g.total)}
+					<a class="tuile lien-tuile" href="#/badges">
+						<span class="titre">{g.titre}</span>
+						<span class="valeur">{g.faits}<small> / {g.total}</small></span>
+						<div class="barre"><span style:width="{pc}%"></span></div>
+						<span class="pc">
+							{#if g.prochaine}
+								Prochaine : {g.prochaine.personne ?? g.prochaine.nom}{g.prochaine.lieu ? ` (${g.prochaine.lieu})` : ''}
+							{:else}
+								✓ Terminé
+							{/if}
+						</span>
+					</a>
+				{/each}
+			</div>
+		</section>
+	{/if}
 
 	{#if manquants.length}
 		<section>
@@ -155,10 +187,13 @@
 			<ul class="parties">
 				{#each etat.parties as p (p.id)}
 					{@const jeu = etat.jeux.find((j) => j.id === p.jeu)}
+					{@const a = avancement(p, jeu, etat.progression)}
 					<li>
 						<strong>{p.nom}</strong>
 						<span>{jeu?.versions.find((v) => v.id === p.version)?.nom ?? p.version}</span>
-						<span>{Object.values(p.captures).filter((c) => c.attrape).length} attrapés</span>
+						<span>{a.total ? `${a.pourcentage} % du Pokédex` : `${a.attrapes} attrapés`}</span>
+						{#if a.premierGroupe}<span>{a.premierGroupe.titre} : {a.premierGroupe.faits} / {a.premierGroupe.total}</span>{/if}
+						<StatutPartie av={a} />
 					</li>
 				{/each}
 			</ul>
@@ -171,8 +206,30 @@
 		margin: 0;
 	}
 	.intro {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 4px 10px;
 		margin: 0 0 14px;
 		color: var(--ecran-texte-doux);
+	}
+	.avec-lien {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 10px;
+	}
+	.avec-lien a {
+		font-size: 0.85rem;
+		font-weight: 600;
+		text-decoration: none;
+	}
+	.lien-tuile {
+		color: inherit;
+		text-decoration: none;
+	}
+	.lien-tuile:hover {
+		background: var(--ecran-survol);
 	}
 	section {
 		margin-bottom: 22px;
@@ -287,6 +344,7 @@
 	.parties li {
 		display: flex;
 		flex-wrap: wrap;
+		align-items: center;
 		gap: 4px 12px;
 		padding: 6px 10px;
 		border-radius: 6px;

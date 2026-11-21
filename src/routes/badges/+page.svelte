@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { avancement, cleEtape, etapesVersion, LIBELLES_STATUT } from '$lib/aventure';
+	import { avancement, cleEtape, etapesVersion } from '$lib/aventure';
+	import StatutPartie from '$lib/composants/StatutPartie.svelte';
 	import BadgeType from '$lib/composants/BadgeType.svelte';
 	import { cleType } from '$lib/donnees';
 	import { etat } from '$lib/etat.svelte';
@@ -22,8 +23,8 @@
 	<h1>Badges et Ligue</h1>
 	<p class="intro" style:--couleur-version={version?.couleur}>
 		{jeu?.nom} — {version?.nom} ·
-		<strong>{av?.etapesFaites} / {av?.etapesTotal}</strong> étapes ·
-		<span class="statut">{av ? LIBELLES_STATUT[av.statut] : ''}</span>
+		<strong>{av?.etapesFaites} / {av?.etapesTotal}</strong> étapes
+		{#if av}<StatutPartie {av} />{/if}
 	</p>
 
 	{#each groupes as g (g.id)}
@@ -93,6 +94,12 @@
 		margin: 0 0 16px;
 		font-size: 0.9rem;
 		color: var(--ecran-texte-doux);
+	}
+	.intro {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 4px 8px;
 	}
 	.intro strong {
 		color: var(--ecran-texte);
