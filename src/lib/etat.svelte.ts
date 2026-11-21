@@ -157,6 +157,10 @@ class Etat {
 	async basculerCapture(pokemon: number) {
 		await this.modifierCapture(pokemon, { attrape: !this.estAttrape(pokemon) });
 	}
+
+	async basculerChromatique(pokemon: number) {
+		await this.modifierCapture(pokemon, { shiny: !this.capture(pokemon)?.shiny });
+	}
 }
 
 export const etat = new Etat();

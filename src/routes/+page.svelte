@@ -4,6 +4,7 @@
 	import ListeObtentions from '$lib/composants/ListeObtentions.svelte';
 	import PuceMethode from '$lib/composants/PuceMethode.svelte';
 	import BoutonCapture from '$lib/composants/BoutonCapture.svelte';
+	import BoutonChromatique from '$lib/composants/BoutonChromatique.svelte';
 	import NouvellePartie from '$lib/composants/NouvellePartie.svelte';
 	import { normaliser, numero , sprite } from '$lib/donnees';
 	import { etat } from '$lib/etat.svelte';
@@ -17,6 +18,8 @@
 	});
 	let donnees = $derived(etat.donnees);
 	let version = $derived(donnees?.jeu.versions.find((v) => v.id === partie?.version));
+	/** Les chromatiques apparaissent à partir de la 2e génération */
+	let chromatiques = $derived((donnees?.jeu.generation ?? 1) >= 2);
 
 	let fiches = $derived(
 		donnees && partie && donnees.jeu.id === partie.jeu
@@ -191,7 +194,7 @@
 					<span class="numero">{numero(f.numero)}</span>
 					<img
 						class="sprite"
-						src={sprite(f.pokemon, partie.version)}
+						src={sprite(f.pokemon, partie.version, chromatiques && !!etat.capture(f.pokemon.id)?.shiny)}
 						alt=""
 						width="56"
 						height="56"
@@ -203,9 +206,6 @@
 							{#each f.pokemon.types as t (t)}
 								<BadgeType type={t} />
 							{/each}
-							{#if etat.capture(f.pokemon.id)?.shiny}
-								<span class="chroma" title="Chromatique obtenu" aria-label="Chromatique obtenu">★</span>
-							{/if}
 							{#if f.pokemon.formes?.length}
 								{@const obtenues = f.pokemon.formes.filter((x) => etat.capture(f.pokemon.id)?.formes?.[x.id]).length}
 								<span class="nb-formes" title="Formes et Méga-évolutions obtenues"
@@ -254,7 +254,16 @@
 							>
 						</a>
 					{/if}
-					<BoutonCapture {attrape} nom={f.pokemon.nom} onclick={() => etat.basculerCapture(f.pokemon.id)} />
+					<div class="actions">
+						{#if chromatiques}
+							<BoutonChromatique
+								actif={!!etat.capture(f.pokemon.id)?.shiny}
+								nom={f.pokemon.nom}
+								onclick={() => etat.basculerChromatique(f.pokemon.id)}
+							/>
+						{/if}
+						<BoutonCapture {attrape} nom={f.pokemon.nom} onclick={() => etat.basculerCapture(f.pokemon.id)} />
+					</div>
 				</li>
 			{/each}
 		</ol>
@@ -374,7 +383,8 @@
 	.liste > li > :global(*) {
 		align-self: start;
 	}
-	.liste > li > :global(button) {
+	.actions {
+		display: flex;
 		margin-top: 6px;
 	}
 	.infos {
@@ -460,10 +470,6 @@
 	.lien-fiche:hover {
 		text-decoration: underline;
 	}
-	.chroma {
-		color: var(--voyant-jaune);
-		text-shadow: 0 0 2px rgb(0 0 0 / 0.6);
-	}
 	.nb-formes {
 		font-size: 0.7rem;
 		font-weight: 600;
@@ -515,7 +521,7 @@
 			gap: 6px;
 			padding: 4px 0;
 		}
-		.liste > li > :global(button) {
+		.actions {
 			margin-top: 0;
 		}
 		.infos {

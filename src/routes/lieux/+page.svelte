@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
 	import { analyserLieux } from '$lib/analyse';
 	import { normaliser, sprite } from '$lib/donnees';
 	import { etat } from '$lib/etat.svelte';
@@ -27,13 +27,13 @@
 	<h1>Lieux</h1>
 	<p class="intro">
 		Dans l'ordre de progression de {donnees.jeu.nom} ({donnees.jeu.versions.find((v) => v.id === partie.version)?.nom}).
-		Le compteur indique les PokÃ©mon encore Ã  attraper sur place.
+		Le compteur indique les Pokémon encore à attraper sur place.
 	</p>
 
 	<div class="outils">
 		<label class="sr-only" for="r-lieu">Rechercher un lieu</label>
-		<input id="r-lieu" class="champ" type="search" placeholder="Rechercher un lieuâ€¦" bind:value={recherche} />
-		<label class="case"><input type="checkbox" bind:checked={masquerTermines} /> Masquer les lieux terminÃ©s</label>
+		<input id="r-lieu" class="champ" type="search" placeholder="Rechercher un lieu…" bind:value={recherche} />
+		<label class="case"><input type="checkbox" bind:checked={masquerTermines} /> Masquer les lieux terminés</label>
 	</div>
 
 	<ol class="liste">
@@ -47,7 +47,7 @@
 						{/each}
 					</span>
 					<span class="compteur">
-						{#if l.reste === 0}âœ“ TerminÃ©{:else}reste <strong>{l.reste}</strong> / {l.total}{/if}
+						{#if l.reste === 0}✓ Terminé{:else}reste <strong>{l.reste}</strong> / {l.total}{/if}
 					</span>
 				</a>
 			</li>

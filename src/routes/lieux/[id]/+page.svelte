@@ -4,6 +4,7 @@
 	import { analyserLieux, decrire } from '$lib/analyse';
 	import BadgeType from '$lib/composants/BadgeType.svelte';
 	import BoutonCapture from '$lib/composants/BoutonCapture.svelte';
+	import BoutonChromatique from '$lib/composants/BoutonChromatique.svelte';
 	import PuceMethode from '$lib/composants/PuceMethode.svelte';
 	import { etat } from '$lib/etat.svelte';
 
@@ -12,6 +13,9 @@
 	let lieux = $derived(donnees && partie ? analyserLieux(donnees, partie.version) : []);
 	let index = $derived(lieux.findIndex((l) => l.lieu.id === page.params.id));
 	let fiche = $derived(index >= 0 ? lieux[index] : null);
+
+	/** Les chromatiques apparaissent à partir de la 2e génération */
+	let chromatiques = $derived((donnees?.jeu.generation ?? 1) >= 2);
 
 	let manquantsSeulement = $state(false);
 	let pokemons = $derived(
@@ -54,7 +58,13 @@
 		{#each pokemons as p (p.pokemon.id)}
 			{@const attrape = etat.estAttrape(p.pokemon.id)}
 			<li class:attrape>
-				<img src={sprite(p.pokemon, partie.version)} alt="" width="56" height="56" loading="lazy" />
+				<img
+					src={sprite(p.pokemon, partie.version, chromatiques && !!etat.capture(p.pokemon.id)?.shiny)}
+					alt=""
+					width="56"
+					height="56"
+					loading="lazy"
+				/>
 				<div class="infos">
 					<div class="nom">
 						<a href="#/pokemon/{p.pokemon.id}">{p.pokemon.nom}</a>
@@ -66,7 +76,16 @@
 						{/each}
 					</ul>
 				</div>
-				<BoutonCapture {attrape} nom={p.pokemon.nom} onclick={() => etat.basculerCapture(p.pokemon.id)} />
+				<div class="actions">
+					{#if chromatiques}
+						<BoutonChromatique
+							actif={!!etat.capture(p.pokemon.id)?.shiny}
+							nom={p.pokemon.nom}
+							onclick={() => etat.basculerChromatique(p.pokemon.id)}
+						/>
+					{/if}
+					<BoutonCapture {attrape} nom={p.pokemon.nom} onclick={() => etat.basculerCapture(p.pokemon.id)} />
+				</div>
 			</li>
 		{/each}
 	</ul>
@@ -130,6 +149,9 @@
 	}
 	img {
 		image-rendering: pixelated;
+	}
+	.actions {
+		display: flex;
 	}
 	.nom {
 		display: flex;
