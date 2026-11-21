@@ -71,6 +71,12 @@ class TestEntree(unittest.TestCase):
 
 
 class TestDivers(unittest.TestCase):
+    def test_modeles_wiki(self):
+        self.assertEqual(norm.wiki_vers_texte("(en communiquant avec {{Abréviation{{!}}RS}})"),
+                         "(en communiquant avec Rubis/Saphir)")
+        self.assertEqual(norm.wiki_vers_texte("Pendant la {{Mission"), "Pendant la Mission")
+        self.assertEqual(norm.analyser_lieu("Cauchemar de Nouvellune@pendant la {{Mission")[2], "Pendant la Mission")
+
     def test_nom_forme(self):
         self.assertEqual(norm.analyser_nom("Miaouss forme(Galar)"), ("Miaouss", "Galar"))
         self.assertEqual(norm.analyser_nom("M. Mime"), ("M. Mime", None))

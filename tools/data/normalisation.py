@@ -43,12 +43,33 @@ _ORDINAUX = {
 _MOTS_TAUX = {"Un": 1, "Deux": 2, "Trois": 3, "Quatre": 4, "Cinq": 5, "Six": 6, "Sept": 7, "Huit": 8}
 
 
+#: Sigles des jeux utilisés par le modèle {{Abréviation|…}} de Poképédia
+ABREVIATIONS_JEUX = {
+    "RB": "Rouge/Bleu", "J": "Jaune", "OA": "Or/Argent", "C": "Cristal", "RS": "Rubis/Saphir",
+    "E": "Émeraude", "RFVF": "Rouge Feu/Vert Feuille", "DP": "Diamant/Perle", "Pt": "Platine",
+    "HGSS": "Or HeartGold/Argent SoulSilver", "NB": "Noir/Blanc", "N2B2": "Noir 2/Blanc 2",
+    "XY": "X/Y", "ROSA": "Rubis Oméga/Saphir Alpha", "SL": "Soleil/Lune", "USUL": "Ultra-Soleil/Ultra-Lune",
+    "LGPE": "Let's Go Pikachu/Évoli", "LGP": "Let's Go Pikachu", "LGE": "Let's Go Évoli",
+    "EB": "Épée/Bouclier", "DEPS": "Diamant Étincelant/Perle Scintillante", "LPA": "Légendes Arceus",
+    "EV": "Écarlate/Violet", "LPZA": "Légendes Z-A",
+}
+
+
+def _abreviation(m: re.Match) -> str:
+    sigle = m.group(1).strip()
+    return ABREVIATIONS_JEUX.get(sigle, sigle)
+
+
 def wiki_vers_texte(texte: str) -> str:
-    """Retire la syntaxe wiki : [[Page|Texte]] → Texte, {{Objet|Nautile|...}} → Nautile, {{P}} → ₽."""
-    texte = texte.replace("{{P}}", "₽")
+    """Retire la syntaxe wiki : [[Page|Texte]] → Texte, {{Objet|Nautile|...}} → Nautile, {{P}} → ₽,
+    {{Abréviation{{!}}RS}} → Rubis/Saphir. Les accolades orphelines (modèle tronqué) sont supprimées."""
+    texte = texte.replace("{{P}}", "₽").replace("{{!}}", "|")
     texte = re.sub(r"\[\[(?:[^\]|]*\|)?([^\]]*)\]\]", r"\1", texte)
+    texte = re.sub(r"\{\{Abréviation\|([^|}]*)[^}]*\}\}", _abreviation, texte)
     texte = re.sub(r"\{\{Objet\|([^|}]*)[^}]*\}\}", r"\1", texte)
     texte = re.sub(r"\{\{[^|}]*\|([^|}]*)[^}]*\}\}", r"\1", texte)
+    texte = re.sub(r"\{\{([^{}|]*)\}\}", r"\1", texte)
+    texte = texte.replace("{{", "").replace("}}", "")
     return texte.strip()
 
 
@@ -266,4 +287,5 @@ def analyser_lieu(cle: str) -> tuple[str, str, str | None]:
     page, _, affiche = page_aff.partition("|")
     if not affiche:
         affiche = re.sub(r" \((Kanto|Johto|Hoenn|Sinnoh|Unys|Kalos|Alola|Galar|Hisui|Paldea)\)$", "", page)
+    sous_zone = wiki_vers_texte(sous_zone) if sous_zone else ""
     return page, affiche, (sous_zone[:1].upper() + sous_zone[1:]) if sous_zone else None
